@@ -1,9 +1,8 @@
 defmodule GrpcMock.Application do
-  # See https://hexdocs.pm/elixir/Application.html
-  # for more information on OTP Applications
   @moduledoc false
 
   use Application
+  alias GrpcMock.PbDynamicCompiler
 
   @impl true
   def start(_type, _args) do
@@ -15,6 +14,7 @@ defmodule GrpcMock.Application do
       # Start the Endpoint (http/https)
       GrpcMockWeb.Endpoint,
       # Start a worker by calling: GrpcMock.Worker.start_link(arg)
+      PbDynamicCompiler,
       {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor}
     ]
 
