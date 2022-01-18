@@ -1,5 +1,6 @@
 defmodule GrpcMock.DynamicGrpc.DynamicSupervisor do
   use DynamicSupervisor
+  alias GrpcMock.DynamicGrpc.GrpcGenServer
 
   def start_link(init_arg) do
     DynamicSupervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
@@ -10,7 +11,8 @@ defmodule GrpcMock.DynamicGrpc.DynamicSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one)
   end
 
-  def start_child(child_spec) do
-    DynamicSupervisor.start_child(__MODULE__, child_spec)
+  def start_server(server, endpoint) do
+    spec = {GrpcGenServer, {server, endpoint}}
+    DynamicSupervisor.start_child(__MODULE__,spec)
   end
 end

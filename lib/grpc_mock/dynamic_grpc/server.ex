@@ -4,13 +4,11 @@ defmodule GrpcMock.DynamicGrpc.Server do
   alias GrpcMock.DynamicGrpc.MockResponse
 
   @required [:service, :port]
-  @optional [:id, :pid, :status]
+  @optional [:id]
 
   embedded_schema do
-    field :pid, :string
     field :service, :string
     field :port, :integer
-    field :status, :string, default: "down"
     embeds_many :mock_responses, MockResponse
   end
 
@@ -19,7 +17,6 @@ defmodule GrpcMock.DynamicGrpc.Server do
     |> cast(params, @required ++ @optional)
     |> cast_embed(:mock_responses, required: true)
     |> validate_required(@required)
-    |> validate_inclusion(:status, ["up", "down"])
   end
 
   def new(params) do
