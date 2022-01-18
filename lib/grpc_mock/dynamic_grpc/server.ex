@@ -28,9 +28,8 @@ defmodule GrpcMock.DynamicGrpc.Server do
 
   @spec new(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def new(params) do
-    params = Map.put_new(params, :id, Nanoid.generate())
-
     %__MODULE__{}
+    |> Map.put(:id, Nanoid.generate())
     |> changeset(params)
     |> apply_action(:insert)
   end

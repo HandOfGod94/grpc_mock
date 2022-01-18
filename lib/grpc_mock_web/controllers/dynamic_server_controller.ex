@@ -14,13 +14,13 @@ defmodule GrpcMockWeb.DynamicServerController do
     render(conn, "new.html", changeset: changeset)
   end
 
-  def create(conn, %{"dynamic_server" => dynamic_server_params}) do
-    case DynamicGrpc.start_server(dynamic_server_params) do
-      {:ok, dynamic_server} ->
-        conn
-        |> put_flash(:info, "Dynamic server created successfully.")
-        |> redirect(to: Routes.dynamic_server_path(conn, :show, dynamic_server))
-
+  def create(conn, %{"server" => dynamic_server_params}) do
+    with {:ok, server} <- Server.new(dynamic_server_params),
+         {:ok, server} <- DynamicGrpc.start_server(server) do
+      conn
+      |> put_flash(:info, "Dynamic server created successfully.")
+      |> redirect(to: Routes.dynamic_server_path(conn, :show, server))
+    else
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)
     end

@@ -13,9 +13,21 @@
   <%= number_input f, :port %>
   <%= error_tag f, :port %>
 
-  <%= label f, :mock_responses %>
-  <%= text_input f, :mock_responses %>
-  <%= error_tag f, :mock_responses %>
+  <%= for mf <- inputs_for(f, :mock_responses) |> Enum.map(&Map.put(&1, :action, :validate)) do %>
+    <h3>Mocks</h3>
+
+    <%= label mf, :method %>
+    <%= text_input mf, :method %>
+    <%= error_tag mf, :method %>
+
+    <%= label mf, :return_type %>
+    <%= text_input mf, :return_type %>
+    <%= error_tag mf, :return_type %>
+
+    <%= label mf, :data %>
+    <%= textarea mf, :data %>
+    <%= error_tag mf, :data %>
+  <% end %>
 
   <div>
     <%= submit "Save" %>
