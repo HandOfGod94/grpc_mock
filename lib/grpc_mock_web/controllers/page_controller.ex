@@ -1,6 +1,7 @@
 defmodule GrpcMockWeb.PageController do
   use GrpcMockWeb, :controller
   require Logger
+  alias GrpcMock.PbDynamicCompiler
 
   def index(conn, _params) do
     render(conn, "index.html")
@@ -11,8 +12,8 @@ defmodule GrpcMockWeb.PageController do
   end
 
   def create(conn, %{"import_path" => import_path, "proto_file_glob" => proto_file_glob}) do
-    Logger.info("Import path: #{import_path}")
-    Logger.info("Proto File Glob: #{proto_file_glob}")
+    PbDynamicCompiler.protoc_compile(import_path, proto_file_glob)
+    PbDynamicCompiler.load_modules()
     render(conn, "index.html")
   end
 end

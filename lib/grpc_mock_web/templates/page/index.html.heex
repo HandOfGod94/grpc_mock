@@ -3,14 +3,20 @@
   <p>Now spin up grpc mock server with 1-click</p>
 </section>
 
-  <%= form_for @conn, Routes.page_path(@conn, :create), fn f -> %>
-    <label>
-      Import path: <%= text_input f, :import_path %>
-    </label>
+<%= form_for @conn, Routes.page_path(@conn, :create), fn f -> %>
+  <label>
+    Import path: <%= text_input f, :import_path %>
+  </label>
 
-    <label>
-      Proto File Glob: <%= text_input f, :proto_file_glob %>
-    </label>
+  <label>
+    Proto File Glob: <%= text_input f, :proto_file_glob %>
+  </label>
 
-    <%= submit "Submit" %>
-  <% end %>
+  <%= submit "Submit" %>
+<% end %>
+
+<section class="row">
+  <div class="column">
+    <%= live_render(@conn, GrpcMockWeb.ProtocModuleLive.Index) %>
+  </div>
+</section>
