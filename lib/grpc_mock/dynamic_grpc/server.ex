@@ -1,10 +1,9 @@
 defmodule GrpcMock.DynamicGrpc.Server do
   def generate_implmentation(mock) do
-    methods = get_in(mock.responses, [Access.all(), Access.key(:method_name)])
-    resp_structs = get_in(mock.responses, [Access.all(), Access.key(:return_type)])
-    data = get_in(mock.responses, [Access.all(), Access.key(:data)])
-
-    mocks = Enum.zip([methods, resp_structs, data])
+    mocks =
+      Enum.map(mock.responses, fn response ->
+        {response.method_name, response.return_type, inspect(response.data)}
+      end)
 
     {content, _} =
       :code.priv_dir(:grpc_mock)
