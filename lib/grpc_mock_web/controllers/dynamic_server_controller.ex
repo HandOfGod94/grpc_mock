@@ -35,7 +35,7 @@ defmodule GrpcMockWeb.DynamicServerController do
     {:ok, _dynamic_server} = DynamicGrpc.stop_server(id)
 
     conn
-    |> put_flash(:info, "Dynamic server deleted successfully.")
+    |> put_flash(:info, "Dynamic server stopped successfully.")
     |> redirect(to: Routes.dynamic_server_path(conn, :index))
   end
 end
