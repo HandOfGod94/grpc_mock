@@ -16,3 +16,18 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
+
+## TODO
+**core**
+- [ ] generate elixir proto files programmatically
+- [ ] load generated modules in the code
+- [ ] spin up grpc server with mock implmentation using `DynamicSupervisor`
+  - [ ] allocate ports dynamically based on the service chosen
+- [ ] read stub response from user `json`
+
+**UI**
+- [ ] get import_path from user
+- [ ] get protofiles from user
+- [ ] allow user to select service which needs to be stubbed
+- [ ] accept stub response from user
+- [ ] show grpc server info (current active stub, ports, state) on UI

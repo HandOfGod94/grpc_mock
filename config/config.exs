@@ -14,6 +14,8 @@ config :grpc_mock, GrpcMockWeb.Endpoint,
   pubsub_server: GrpcMock.PubSub,
   live_view: [signing_salt: "tGAWMwR/"]
 
+config :grpc_mock, :proto_out_dir, "./tmp"
+
 # Configures the mailer
 #
 # By default it uses the "Local" adapter which stores the emails
@@ -43,6 +45,8 @@ config :logger, :console,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+config :grpc, start_server: true
+
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
