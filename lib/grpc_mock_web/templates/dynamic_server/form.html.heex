@@ -1,0 +1,23 @@
+<.form let={f} for={@changeset} action={@action}>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label f, :service %>
+  <%= text_input f, :service %>
+  <%= error_tag f, :service %>
+
+  <%= label f, :port %>
+  <%= number_input f, :port %>
+  <%= error_tag f, :port %>
+
+  <%= label f, :mock_responses %>
+  <%= text_input f, :mock_responses %>
+  <%= error_tag f, :mock_responses %>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+</.form>

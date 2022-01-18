@@ -1,0 +1,23 @@
+<h1>Show Dynamic server</h1>
+
+<ul>
+
+  <li>
+    <strong>Service:</strong>
+    <%= @dynamic_server.service %>
+  </li>
+
+  <li>
+    <strong>Port:</strong>
+    <%= @dynamic_server.port %>
+  </li>
+
+  <li>
+    <strong>Mock responses:</strong>
+    <%= @dynamic_server.mock_responses %>
+  </li>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.dynamic_server_path(@conn, :edit, @dynamic_server) %></span> |
+<span><%= link "Back", to: Routes.dynamic_server_path(@conn, :index) %></span>

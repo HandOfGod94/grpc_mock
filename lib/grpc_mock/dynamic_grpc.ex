@@ -45,6 +45,10 @@ defmodule GrpcMock.DynamicGrpc do
     end
   end
 
+  def change_dynamic_server(server, params \\ %{}) do
+    Server.changeset(server, params)
+  end
+
   def generate_implmentation(%Server{} = server) do
     mocks =
       Enum.map(server.mock_responses, fn stub ->

@@ -1,0 +1,5 @@
+<h1>Edit Dynamic server</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.dynamic_server_path(@conn, :update, @dynamic_server)) %>
+
+<span><%= link "Back", to: Routes.dynamic_server_path(@conn, :index) %></span>

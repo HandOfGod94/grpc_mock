@@ -18,6 +18,7 @@ defmodule GrpcMockWeb.Router do
     pipe_through :browser
 
     resources "/", PageController, only: [:index, :new, :create]
+    resources "/dynamic_servers", DynamicServerController, except: [:edit, :update]
     live "/protoc_modules", ProtocModuleLive.Index, :index
   end
 

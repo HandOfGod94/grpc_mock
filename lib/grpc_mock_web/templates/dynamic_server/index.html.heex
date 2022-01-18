@@ -1,0 +1,30 @@
+<h1>GRPC Servers</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Service</th>
+      <th>Port</th>
+      <th>Mock responses</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for {dynamic_server, idx} <- Enum.with_index(@dynamic_servers, 1) do %>
+    <tr>
+      <td><%= idx %></td>
+      <td><%= dynamic_server.service %></td>
+      <td><%= dynamic_server.port %></td>
+      <td><%= dynamic_server.mock_responses %></td>
+
+      <td>
+        <span><%= link "Show", to: Routes.dynamic_server_path(@conn, :show, dynamic_server) %></span>
+        <span><%= link "Delete", to: Routes.dynamic_server_path(@conn, :delete, dynamic_server), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Dynamic server", to: Routes.dynamic_server_path(@conn, :new) %></span>

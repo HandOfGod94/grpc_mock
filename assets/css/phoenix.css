@@ -75,12 +75,17 @@ header nav ul,
 header nav li {
   margin: 0;
   padding: 0;
-  display: block;
+  display: inline-block;
   text-align: right;
   white-space: nowrap;
 }
 header nav ul {
   margin: 1rem;
+  margin-top: 0;
+}
+
+header nav li {
+  margin: 0.5rem;
   margin-top: 0;
 }
 header nav a {
