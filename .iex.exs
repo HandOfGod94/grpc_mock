@@ -1,4 +1,5 @@
-alias GrpcMock.DynamicGrpc.Server, as: DynamicGrpcServer
+alias GrpcMock.DynamicGrpc.Server
+alias GrpcMock.DynamicGrpc.ServerRegistry
 alias GrpcMock.DynamicGrpc.Mock
-alias GrpcMock.PbGenerator
-alias GrpcMock.DynamicGrpc.DynamicSupervisor, as: DynamicGrpcSupervisor
+alias GrpcMock.PbDynamicCompiler
+alias GrpcMock.DynamicGrpc.MockResponse

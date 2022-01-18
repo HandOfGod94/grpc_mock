@@ -1,33 +1,38 @@
 defmodule GrpcMock.DynamicGrpc.Server do
-  defmodule ValidationError do
-    defexception [:field, :value]
+  use Ecto.Schema
+  import Ecto.Changeset
+  alias GrpcMock.DynamicGrpc.MockResponse
 
-    def message(validation_error) do
-      "invalid value: #{inspect(validation_error.value)} provided for field: #{validation_error.field}"
-    end
+  @required [:service, :port]
+  @optional [:id, :pid, :status]
+
+  embedded_schema do
+    field :pid, :string
+    field :service, :string
+    field :port, :integer
+    field :status, :string, default: "down"
+    embeds_many :mock_responses, MockResponse
   end
 
-  defmodule Response do
-    defstruct [:method_name, :return_type, data: %{}, headers: %{}, trailers: %{}]
-
-    def new(params) do
-      {:ok, struct(__MODULE__, params)}
-    end
+  def changeset(server, params\\%{}) do
+    server
+    |> cast(params, @required ++ @optional)
+    |> cast_embed(:mock_responses, required: true)
+    |> validate_required(@required)
+    |> validate_inclusion(:status, ["up", "down"])
   end
-
-  @enforce_keys [:service, :port]
-  defstruct [:pid, :service, :port, status: :down, mocks: []]
-
-  def new(%{status: status}) when status not in [:up, :down],
-    do: {:error, %ValidationError{field: "status", value: status}}
-
-  def new(%{port: port}) when not is_number(port),
-    do: {:error, %ValidationError{field: "port", value: port}}
-
-  def new(%{mocks: mocks}) when not is_list(mocks),
-    do: {:error, %ValidationError{field: "mocks", value: mocks}}
 
   def new(params) do
-    {:ok, struct(__MODULE__, params)}
+    params = Map.put_new(params, :id, Nanoid.generate())
+
+    %__MODULE__{}
+    |> changeset(params)
+    |> apply_action(:insert)
+  end
+
+  def update(server, params) do
+    server
+    |> changeset(params)
+    |> apply_action(:update)
   end
 end

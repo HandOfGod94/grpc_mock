@@ -17,36 +17,48 @@ defmodule GrpcMock.DynamicGrpc.ServerRegistry do
   def create_dynamic_server(params) do
     case Server.new(params) do
       {:ok, server} -> Agent.update(__MODULE__, fn servers -> [server | servers] end)
-      {:error, error} -> {:error, error}
+      {:error, errors} -> {:error, errors}
     end
   end
 
-  def start_dynamic_server(server) do
+  def fetch_server(id) do
+    Agent.get(__MODULE__, fn servers ->
+      Enum.find_value(servers, fn server -> server.id == id end)
+    end)
+  end
+
+  def update_server(id, params) do
+    Agent.update(__MODULE__, fn servers ->
+      with idx when idx >= 0 <- Enum.find_index(servers, fn server -> server.id == id end),
+           server <- Enum.at(servers, idx),
+           {:ok, server} <- Server.update(server, params) do
+        List.replace_at(servers, idx, server)
+      else
+        _ -> servers
+      end
+    end)
+  end
+
+  def start_dynamic_server(id) do
     Agent.get_and_update(__MODULE__, fn servers ->
-      with idx when idx >= 0 <- Enum.find_index(servers, fn s -> s == server end),
-           [_, endpoint_mod] <- DynamicGrpc.generate_implmentation(server.service, server.mocks),
-           endpoint <- elem(endpoint_mod, 0),
+      with server when server != nil <- fetch_server(id),
+           [_, {endpoint, _}] <- DynamicGrpc.generate_implmentation(server),
            {:ok, pid} <-
              DynamicSupervisor.start_child({GRPC.Server.Supervisor, {endpoint, 50001}}) do
-        updated_server_list =
-          List.update_at(servers, idx, fn server -> %{server | status: :up, pid: pid} end)
-
-        {servers, updated_server_list}
+        {server, update_server(id, %{status: "up", pid: to_string(pid)})}
       else
         _ -> {servers, servers}
       end
     end)
   end
 
-  def stop_dynamic_server(server) do
+  def stop_dynamic_server(id) do
     Agent.get_and_update(__MODULE__, fn servers ->
-      with idx when idx >= 0 <- Enum.find_index(servers, fn s -> s == server end),
-           server <- Enum.at(servers, idx),
-           :ok <- GenServer.stop(server.pid) do
-        updated_server_list =
-          List.update_at(servers, idx, fn server -> %{server | status: :down, pid: nil} end)
-
-        {servers, updated_server_list}
+      with server when server != nil <- fetch_server(id),
+           :ok <- GenServer.stop(pid(server.pid)),
+           {:ok, server} <- Server.update(server, %{status: "down", pid: nil}) do
+        updated_server_list = List.replace_at(servers, idx, server)
+        {servers, update_server(id, %{status: "down", pid: nil})}
       else
         _ -> {servers, servers}
       end
