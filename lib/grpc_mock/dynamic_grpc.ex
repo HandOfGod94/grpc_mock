@@ -89,7 +89,6 @@ defmodule GrpcMock.DynamicGrpc do
         _otherwise, acc -> acc
       end)
 
-    IO.inspect(errors)
     if errors != [] do
       {:error, errors}
     else

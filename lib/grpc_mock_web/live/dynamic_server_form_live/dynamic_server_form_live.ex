@@ -52,8 +52,6 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
       exisiting_changeset
       |> Ecto.Changeset.put_embed(:mock_responses, new_responses)
 
-    IO.inspect(changeset)
-
     {:noreply, assign(socket, changeset: changeset)}
   end
 end

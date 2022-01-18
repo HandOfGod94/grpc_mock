@@ -10,6 +10,11 @@ defmodule GrpcMock.MixProject do
       compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      releases: [
+        grpc_mock: [
+          include_erts: false
+        ]
+      ],
       deps: deps()
     ]
   end
