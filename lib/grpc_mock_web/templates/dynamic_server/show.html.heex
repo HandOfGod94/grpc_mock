@@ -19,6 +19,7 @@
 
   <h3>Mocks</h3>
   <%= for response <- @dynamic_server.mock_responses do %>
+    <hr />
     <li>
       <strong>Method</strong>
       <%= response.method %>
@@ -37,6 +38,7 @@
         </code>
       </pre>
     </li>
+    <hr />
   <% end %>
 </ul>
 

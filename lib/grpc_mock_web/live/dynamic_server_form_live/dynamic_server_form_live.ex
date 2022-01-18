@@ -39,4 +39,21 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
         {:noreply, assign(socket, :errors, inspect(error))}
     end
   end
+
+  def handle_event("add-mock-response", _, socket) do
+    exisiting_changeset = socket.assigns.changeset
+    existing_responses = Map.get(exisiting_changeset.changes, :mock_responses)
+
+    new_responses =
+      existing_responses
+      |> Enum.concat([%MockResponse{}])
+
+    changeset =
+      exisiting_changeset
+      |> Ecto.Changeset.put_embed(:mock_responses, new_responses)
+
+    IO.inspect(changeset)
+
+    {:noreply, assign(socket, changeset: changeset)}
+  end
 end

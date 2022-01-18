@@ -5,6 +5,7 @@ defmodule GrpcMock.DynamicGrpc do
   require Logger
 
   @registry GrpcMock.ServerRegistry
+  @otp_app :grpc_mock
 
   @moduledoc """
   format in which servers are stored in registry:
@@ -50,23 +51,49 @@ defmodule GrpcMock.DynamicGrpc do
   end
 
   def generate_implmentation(%Server{} = server) do
-    mocks =
-      Enum.map(server.mock_responses, fn stub ->
-        {stub.method, stub.return_type, inspect(Jason.decode!(stub.data))}
-      end)
+    with mocks <- create_mocks(server.mock_responses),
+         :ok <- accumulate_errors(mocks) do
+      {content, _} =
+        :code.priv_dir(@otp_app)
+        |> Path.join("dynamic_server.eex")
+        |> EEx.compile_file()
+        |> Code.eval_quoted(app: app_name(server.service), service: server.service, mocks: mocks)
 
-    {content, _} =
-      :code.priv_dir(:grpc_mock)
-      |> Path.join("dynamic_server.eex")
-      |> EEx.compile_file()
-      |> Code.eval_quoted(app: app_name(server.service), service: server.service, mocks: mocks)
-
-    Code.compile_string(content)
+      Code.compile_string(content)
+    end
   end
 
   defp app_name(service_module) do
     service_module
     |> String.split(".")
     |> Enum.at(-2)
+  end
+
+  defp create_mocks(mock_responses) do
+    Enum.reduce(mock_responses, [], fn resp, acc ->
+      case Jason.decode(resp.data, keys: :atoms) do
+        {:ok, data} ->
+          stub = {resp.method, resp.return_type, inspect(data)}
+          [stub | acc]
+
+        {:error, error} ->
+          [{:error, error} | acc]
+      end
+    end)
+  end
+
+  defp accumulate_errors(mocks) do
+    errors =
+      Enum.reduce(mocks, [], fn
+        {:error, error}, acc -> acc ++ [error]
+        _otherwise, acc -> acc
+      end)
+
+    IO.inspect(errors)
+    if errors != [] do
+      {:error, errors}
+    else
+      :ok
+    end
   end
 end
