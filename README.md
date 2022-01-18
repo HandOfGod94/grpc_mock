@@ -54,18 +54,3 @@ make build
 # run
 make run
 ```
-
-## TODO
-**core**
-- [x] generate elixir proto files programmatically
-- [x] load generated modules in the code
-- [x] spin up grpc server with mock implmentation using `DynamicSupervisor`
-  - [ ] allocate ports dynamically based on the service chosen
-- [x] read stub response from user `json`
-
-**UI**
-- [x] get import_path from user
-- [x] get protofiles from user
-- [ ] allow user to select service which needs to be stubbed
-- [ ] accept stub response from user
-- [x] show grpc server info (current active stub, ports, state) on UI
