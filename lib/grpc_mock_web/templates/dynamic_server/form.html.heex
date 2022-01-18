@@ -1,7 +1,14 @@
-<.form let={f} for={@changeset} action={@action}>
+<h1>New Dynamic server</h1>
+
+<.form
+  let={f}
+  for={@changeset}
+  phx-change="validate"
+  phx-submit="save">
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Oops, something went wrong! Please check the errors below.</p>
+      <%= @errors %>
     </div>
   <% end %>
 
@@ -13,7 +20,7 @@
   <%= number_input f, :port %>
   <%= error_tag f, :port %>
 
-  <%= for mf <- inputs_for(f, :mock_responses) |> Enum.map(&Map.put(&1, :action, :validate)) do %>
+  <%= inputs_for f, :mock_responses, fn mf -> %>
     <h3>Mocks</h3>
 
     <%= label mf, :method %>

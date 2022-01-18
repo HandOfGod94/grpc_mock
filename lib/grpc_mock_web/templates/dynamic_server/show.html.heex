@@ -1,23 +1,43 @@
-<h1>Show Dynamic server</h1>
-
+<h1>Dynamic Server Details</h1>
 <ul>
-
+  <li>
+    <strong>PID:</strong>
+    <%= inspect(@pid) %>
+  </li>
   <li>
     <strong>Service:</strong>
     <%= @dynamic_server.service %>
   </li>
-
   <li>
     <strong>Port:</strong>
     <%= @dynamic_server.port %>
   </li>
-
   <li>
-    <strong>Mock responses:</strong>
-    <%= @dynamic_server.mock_responses %>
+    <strong>Alive?:</strong>
+    <%= Process.alive?(@pid) %>
   </li>
 
+  <h3>Mocks</h3>
+  <%= for response <- @dynamic_server.mock_responses do %>
+    <li>
+      <strong>Method</strong>
+      <%= response.method %>
+    </li>
+
+    <li>
+      <strong>Return type</strong>
+      <%= response.return_type %>
+    </li>
+
+    <li>
+      <strong>Data</strong>
+      <pre>
+        <code>
+          <%= response.data %>
+        </code>
+      </pre>
+    </li>
+  <% end %>
 </ul>
 
-<span><%= link "Edit", to: Routes.dynamic_server_path(@conn, :edit, @dynamic_server) %></span> |
 <span><%= link "Back", to: Routes.dynamic_server_path(@conn, :index) %></span>

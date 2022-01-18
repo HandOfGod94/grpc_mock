@@ -17,9 +17,10 @@ defmodule GrpcMockWeb.Router do
   scope "/", GrpcMockWeb do
     pipe_through :browser
 
-    resources "/", PageController, only: [:index, :new, :create]
-    resources "/dynamic_servers", DynamicServerController, except: [:edit, :update]
+    live "/dynamic_servers/new", DynamicServerFormLive, :new
     live "/protoc_modules", ProtocModuleLive.Index, :index
+    resources "/", PageController, only: [:index, :new, :create]
+    resources "/dynamic_servers", DynamicServerController, except: [:edit, :update, :new, :create]
   end
 
   # Other scopes may use custom stacks.

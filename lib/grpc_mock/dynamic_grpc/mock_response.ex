@@ -8,9 +8,9 @@ defmodule GrpcMock.DynamicGrpc.MockResponse do
   embedded_schema do
     field :method, :string
     field :return_type, :string
-    field :data, :map, default: %{}
-    field :headers, :map, default: %{}
-    field :trailers, :map, default: %{}
+    field :data, :string, default: ""
+    field :headers, :string, default: ""
+    field :trailers, :string, default: ""
   end
 
   @type t :: %__MODULE__{

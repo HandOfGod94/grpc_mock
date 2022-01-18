@@ -52,7 +52,7 @@ defmodule GrpcMock.DynamicGrpc do
   def generate_implmentation(%Server{} = server) do
     mocks =
       Enum.map(server.mock_responses, fn stub ->
-        {stub.method, stub.return_type, inspect(stub.data)}
+        {stub.method, stub.return_type, inspect(Jason.decode!(stub.data))}
       end)
 
     {content, _} =
