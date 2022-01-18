@@ -13,9 +13,9 @@ defmodule GrpcMock.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: GrpcMock.PubSub},
       # Start the Endpoint (http/https)
-      GrpcMockWeb.Endpoint
+      GrpcMockWeb.Endpoint,
       # Start a worker by calling: GrpcMock.Worker.start_link(arg)
-      # {GrpcMock.Worker, arg}
+      {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

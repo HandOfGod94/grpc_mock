@@ -1,0 +1,16 @@
+defmodule GrpcMock.DynamicGrpc.<%= app %>Server do
+  use GRPC.Server, service: <%= service %>
+
+  <%= for {method, resp_struct, resp} <- mocks do %>
+  def <%= method %>(_request, _stream) do
+    <%= resp_struct %>.new(<%= resp %>)
+  end
+  <% end %>
+end
+
+defmodule <%= app %>.Endpoint do
+  use GRPC.Endpoint
+
+  intercept GRPC.Logger.Server
+  run GrpcMock.DynamicGrpc.<%= app %>Server
+end
