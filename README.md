@@ -8,13 +8,11 @@
 - Generate mock server dynamically and access it via dynamically binded ports
 - partial mocking (only want to mock one or 2 methods out of protobuf contract not an issue, do it rightaway)
 
-## Docker commands
-```sh
-# build
-docker build -t grpc_mock:latest .
-
+## Run using docker
+```
 # ensure to use correct `pwd`
-docker run -it --rm -p 4000-4010:4000-4010 -e SECRET_KEY_BASE=<64-bytes-random> -v $(pwd):/app/protos grpc_mock:latest
+# expose as many ports as you want. Each port can be binded to different mock service.
+docker run -it --rm -p 4000-4010:4000-4010 -e SECRET_KEY_BASE=<64-bytes-random> -v $(pwd):/app/protos ghcr.io/handofgod94/grpc_mock:latest
 ```
 
 ## Elixir Setup
