@@ -19,15 +19,15 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
 ## TODO
 **core**
-- [ ] generate elixir proto files programmatically
-- [ ] load generated modules in the code
-- [ ] spin up grpc server with mock implmentation using `DynamicSupervisor`
+- [x] generate elixir proto files programmatically
+- [x] load generated modules in the code
+- [x] spin up grpc server with mock implmentation using `DynamicSupervisor`
   - [ ] allocate ports dynamically based on the service chosen
 - [ ] read stub response from user `json`
 
 **UI**
-- [ ] get import_path from user
-- [ ] get protofiles from user
+- [x] get import_path from user
+- [x] get protofiles from user
 - [ ] allow user to select service which needs to be stubbed
 - [ ] accept stub response from user
 - [ ] show grpc server info (current active stub, ports, state) on UI
