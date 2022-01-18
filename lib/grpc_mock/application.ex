@@ -3,6 +3,7 @@ defmodule GrpcMock.Application do
 
   use Application
   alias GrpcMock.PbDynamicCompiler
+  alias GrpcMock.DynamicGrpc.ServerRegistry
 
   @impl true
   def start(_type, _args) do
@@ -15,7 +16,8 @@ defmodule GrpcMock.Application do
       GrpcMockWeb.Endpoint,
       # Start a worker by calling: GrpcMock.Worker.start_link(arg)
       PbDynamicCompiler,
-      {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor}
+      ServerRegistry,
+      {DynamicSupervisor, strategy: :one_for_one, restart: :transient, name: GrpcMock.DynamicGrpc.DynamicSupervisor}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
