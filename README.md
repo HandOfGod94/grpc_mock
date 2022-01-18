@@ -15,6 +15,8 @@
 docker run -it --rm -p 4000-4010:4000-4010 -e SECRET_KEY_BASE=<64-bytes-random> -v $(pwd):/app/protos ghcr.io/handofgod94/grpc_mock:latest
 ```
 
+The web UI will be available at [`localhost:4000`](http://localhost:4000)
+
 ## Elixir Setup
 
 * Elixir version: 1.12+
