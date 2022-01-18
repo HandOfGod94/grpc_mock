@@ -1,12 +1,13 @@
-compile: setup
+compile:
 	earthly +compile
 
-build: setup
+build:
 	earthly +build
 
 run:
-	echo "ensure you mount correct protos"
-	echo "run docker run -it -v $(pwd):/app/protos -p 4000:4000 --rm grpc_mock_dev:latest"
+	$(info Please manually run this command)
+	$(info ensure you mount correct protos dir in palce of `$$(pwd)`)
+	$(info docker run -it -v $$(pwd):/app/protos -p 4000:4000 --rm grpc_mock_dev:latest)
 
 setup:
 	brew install earthly/earthly/earthly && earthly bootstra
