@@ -13,6 +13,14 @@ defmodule GrpcMock.DynamicGrpc.MockResponse do
     field :trailers, :map, default: %{}
   end
 
+  @type t :: %__MODULE__{
+    method: String.t(),
+    return_type: String.t(),
+    data: %{binary() => binary()},
+    headers: %{binary() => binary()} | nil,
+    trailers: %{binary() => binary()} | nil
+  }
+
   def changeset(mock_response, params \\ %{}) do
     mock_response
     |> cast(params, @required ++ @optional)

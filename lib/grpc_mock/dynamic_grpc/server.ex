@@ -12,6 +12,13 @@ defmodule GrpcMock.DynamicGrpc.Server do
     embeds_many :mock_responses, MockResponse
   end
 
+  @type t :: %__MODULE__{
+    id: String.t() | nil,
+    service: String.t(),
+    port: Integer.t(),
+    mock_responses: MockResponse.t()
+  }
+
   def changeset(server, params\\%{}) do
     server
     |> cast(params, @required ++ @optional)
@@ -19,6 +26,7 @@ defmodule GrpcMock.DynamicGrpc.Server do
     |> validate_required(@required)
   end
 
+  @spec new(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def new(params) do
     params = Map.put_new(params, :id, Nanoid.generate())
 

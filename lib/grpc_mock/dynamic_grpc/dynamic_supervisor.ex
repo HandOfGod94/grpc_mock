@@ -15,4 +15,8 @@ defmodule GrpcMock.DynamicGrpc.DynamicSupervisor do
     spec = {GrpcGenServer, {server, endpoint}}
     DynamicSupervisor.start_child(__MODULE__,spec)
   end
+
+  def stop_server(pid) do
+    DynamicSupervisor.terminate_child(__MODULE__, pid)
+  end
 end
