@@ -1,26 +1,14 @@
 # GrpcMock
 
-## PreRequsite
-* [Earthly](https://earthly.dev/)
-* Docker
-
-## Makefile Dev commands
-
-```sh
-# install earthly
-make setup
-
-# build/compile
-make compile
-
-# builds docker image
-make build
-
-# run
-make run
-```
+## Features
+- Dynamic Proto Compilation. No need to add dependencies on config file, directly compile it via UI
+- Generate mock server dynamically and access it via dynamically binded ports
+- partial mocking (only want to mock one or 2 methods out of protobuf contract not an issue, do it rightaway)
 
 ## Elixir Setup
+
+* Elixir version: 1.12+
+* Erlang/OTP Version: 23+
 
 To start your Phoenix server:
 
@@ -38,6 +26,24 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
+
+## Build via docker/Earthfile
+* [Earthly](https://earthly.dev/)
+* Docker
+
+```sh
+# install earthly
+make setup
+
+# build/compile
+make compile
+
+# builds docker image
+make build
+
+# run
+make run
+```
 
 ## TODO
 **core**
