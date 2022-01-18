@@ -17,7 +17,7 @@ defmodule GrpcMockWeb.Router do
   scope "/", GrpcMockWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    resources "/", PageController, only: [:index, :new, :create]
   end
 
   # Other scopes may use custom stacks.
