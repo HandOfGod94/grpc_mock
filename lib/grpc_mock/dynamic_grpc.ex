@@ -4,6 +4,12 @@ defmodule GrpcMock.DynamicGrpc do
 
   require Logger
 
+  defmodule StartFailedError do
+    defexception [:reason]
+    @impl true
+    def message(%{reason: reason}), do: "failed to start server. reason: #{inspect(reason)}"
+  end
+
   @registry GrpcMock.ServerRegistry
   @otp_app :grpc_mock
 
@@ -34,7 +40,7 @@ defmodule GrpcMock.DynamicGrpc do
       {:ok, server}
     else
       {:error, %Ecto.Changeset{} = errors} -> {:error, errors}
-      {:error, error} -> {:error, {:failed_to_start_server, inspect(error)}}
+      {:error, error} -> {:error, %StartFailedError{reason: error}}
     end
   end
 

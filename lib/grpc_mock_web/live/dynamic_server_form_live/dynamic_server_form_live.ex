@@ -36,7 +36,7 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
       {:error, error} ->
-        {:noreply, assign(socket, :errors, inspect(error))}
+        {:noreply, assign(socket, :errors, Exception.message(error))}
     end
   end
 
