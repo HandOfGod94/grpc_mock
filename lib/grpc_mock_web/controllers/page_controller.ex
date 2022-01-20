@@ -12,7 +12,7 @@ defmodule GrpcMockWeb.PageController do
   end
 
   def create(conn, %{"import_path" => import_path, "proto_file_glob" => proto_file_glob}) do
-    PbDynamicCompiler.protoc_compile(import_path, proto_file_glob)
+    PbDynamicCompiler.protoc_codegen(import_path, proto_file_glob)
     PbDynamicCompiler.load_modules()
     render(conn, "index.html")
   end

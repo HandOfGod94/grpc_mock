@@ -1,1 +1,0 @@
-call "%~dp0\grpc_mock" eval GrpcMock.Release.migrate

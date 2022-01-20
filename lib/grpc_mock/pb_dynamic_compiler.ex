@@ -9,11 +9,11 @@ defmodule GrpcMock.PbDynamicCompiler do
   ##############
 
   def start_link(_opts) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+    GenServer.start_link(__MODULE__, MapSet.new(), name: __MODULE__)
   end
 
-  def protoc_compile(import_path, proto_files_glob) do
-    GenServer.cast(__MODULE__, {:protoc_compile, import_path, proto_files_glob})
+  def protoc_codegen(import_path, proto_files_glob) do
+    GenServer.cast(__MODULE__, {:protoc_codegen, import_path, proto_files_glob})
   end
 
   def load_modules do
@@ -32,7 +32,7 @@ defmodule GrpcMock.PbDynamicCompiler do
     {:ok, modules}
   end
 
-  def handle_cast({:protoc_compile, import_path, proto_files_glob}, modules) do
+  def handle_cast({:protoc_codegen, import_path, proto_files_glob}, modules) do
     {_, 0} =
       System.cmd(
         "protoc",
@@ -51,10 +51,11 @@ defmodule GrpcMock.PbDynamicCompiler do
       |> Enum.map(&Code.compile_file/1)
       |> List.flatten()
       |> Keyword.keys()
+      |> MapSet.new()
 
     Logger.info("loading of modules is successful")
 
-    {:noreply, modules ++ compiled_modules}
+    {:noreply, MapSet.union(compiled_modules, modules)}
   end
 
   def handle_call({:modules_available}, _from, modules) do
