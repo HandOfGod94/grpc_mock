@@ -14,7 +14,9 @@ config :grpc_mock, GrpcMockWeb.Endpoint,
   pubsub_server: GrpcMock.PubSub,
   live_view: [signing_salt: "tGAWMwR/"]
 
-config :grpc_mock, :proto_out_dir, "./tmp"
+config :grpc_mock,
+  proto_out_dir: "./tmp",
+  compile_status_updates_topic: "compile_status_updates"
 
 # Configures the mailer
 #

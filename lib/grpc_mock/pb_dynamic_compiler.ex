@@ -1,8 +1,12 @@
 defmodule GrpcMock.PbDynamicCompiler do
   use GenServer
   require Logger
+  alias Phoenix.PubSub
+  alias GrpcMock.PbDynamicCompiler.CompileStatus
 
   @out_dir Application.compile_env(:grpc_mock, :proto_out_dir)
+  @compile_status_topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
+  @pubsub GrpcMock.PubSub
 
   defmodule CodegenError do
     defexception [:reason]
@@ -37,9 +41,16 @@ defmodule GrpcMock.PbDynamicCompiler do
     with :ok <- protoc(import_path, proto_files_glob),
          {:ok, mods} <- load_modules() do
       Logger.info("loading of modules was successful")
+      PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{status: :finished})
       {:noreply, MapSet.union(mods, modules)}
     else
-      _ -> {:noreply, modules}
+      {:error, %CodegenError{} = error} ->
+        PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{
+          error: error,
+          status: :failed
+        })
+
+        {:noreply, modules}
     end
   end
 
@@ -68,7 +79,8 @@ defmodule GrpcMock.PbDynamicCompiler do
   defp protoc(import_path, proto_files_glob) do
     System.cmd(
       "protoc",
-      ~w(--proto_path=#{import_path} --elixir_opt=package_prefix=GprcMock.Protos --elixir_out=plugins=grpc:#{@out_dir} #{proto_files_glob})
+      ~w(--proto_path=#{import_path} --elixir_opt=package_prefix=GprcMock.Protos --elixir_out=plugins=grpc:#{@out_dir} #{proto_files_glob}),
+      stderr_to_stdout: true
     )
     |> case do
       {_, 0} -> :ok

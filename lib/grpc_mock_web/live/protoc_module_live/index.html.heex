@@ -1,18 +1,44 @@
-<h3>Protoc Modules</h3>
+<div>
+<section class="phx-hero">
+  <h1>Welcome to GRPC Mock</h1>
+  <p>Now spin up grpc mock server with 1-click</p>
+</section>
 
-<table>
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Name</th>
-    </tr>
-  </thead>
-  <tbody id="protoc_modules">
-    <%= for {protoc_module, idx} <- Enum.with_index(@protoc_modules, 1) do %>
-      <tr>
-        <td><%= idx %></td>
-        <td><%= inspect(protoc_module) %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<.form let={f} for={:protoc_compiler}, phx-submit="save">
+  <label>
+    Import path: <%= text_input f, :import_path %>
+  </label>
+
+  <label>
+    Proto File Glob: <%= text_input f, :proto_file_glob %>
+  </label>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+</.form>
+
+<section class="row">
+  <div class="column">
+    <h3>Protoc Modules</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody id="protoc_modules">
+        <%= for {protoc_module, idx} <- Enum.with_index(@protoc_modules, 1) do %>
+          <tr>
+            <td><%= idx %></td>
+            <td><%= inspect(protoc_module) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>

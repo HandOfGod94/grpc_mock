@@ -14,7 +14,7 @@
       <section class="container">
         <nav>
           <ul>
-            <li><%= link "Home", to: Routes.page_path(@conn, :index) %></li>
+            <li><%= link "Home", to: Routes.protoc_module_index_path(@conn, :index) %></li>
             <li><%= link "Servers", to: Routes.dynamic_server_path(@conn, :index) %></li>
             <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
               <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
