@@ -18,7 +18,7 @@ defmodule GrpcMock.PbDynamicCompiler do
   end
 
   def codegen(import_path, proto_files_glob) do
-    GenServer.call(__MODULE__, {:codegen, import_path, proto_files_glob})
+    GenServer.cast(__MODULE__, {:codegen, import_path, proto_files_glob})
   end
 
   def available_modules do
@@ -33,13 +33,13 @@ defmodule GrpcMock.PbDynamicCompiler do
     {:ok, modules}
   end
 
-  def handle_call({:codegen, import_path, proto_files_glob}, _from, modules) do
+  def handle_cast({:codegen, import_path, proto_files_glob}, modules) do
     with :ok <- protoc(import_path, proto_files_glob),
          {:ok, mods} <- load_modules() do
       Logger.info("loading of modules was successful")
-      {:reply, {:ok, modules}, MapSet.union(mods, modules)}
+      {:noreply, MapSet.union(mods, modules)}
     else
-      error -> {:reply, error, modules}
+      _ -> {:noreply, modules}
     end
   end
 
