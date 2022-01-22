@@ -3,6 +3,8 @@
 :warning::construction: POC  :construction::warning:  
 :warning::construction: Work In Progress  :construction::warning:
 
+[![build](https://github.com/HandOfGod94/grpc_mock/actions/workflows/build.yml/badge.svg)](https://github.com/HandOfGod94/grpc_mock/actions/workflows/build.yml)
+
 ## Features
 - Dynamic Proto Compilation. No need to add dependencies on config file, directly compile it via UI
 - Generate mock server dynamically and access it via dynamically binded ports
