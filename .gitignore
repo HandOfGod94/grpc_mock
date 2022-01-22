@@ -34,3 +34,5 @@ npm-debug.log
 /.elixir_ls/
 /tmp/
 .vscode/
+/priv/plts/*.plt
+/priv/plts/*.plt.hash

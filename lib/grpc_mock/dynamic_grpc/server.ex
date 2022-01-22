@@ -16,7 +16,7 @@ defmodule GrpcMock.DynamicGrpc.Server do
   @type t :: %__MODULE__{
           id: id() | nil,
           service: String.t() | nil,
-          port: Integer.t() | nil,
+          port: number() | nil,
           mock_responses: list(MockResponse.t())
         }
 

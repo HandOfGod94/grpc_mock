@@ -1,5 +1,6 @@
 defmodule GrpcMock.DynamicGrpc.GrpcGenServer do
   use GenServer, restart: :transient
+  alias GrpcMock.DynamicGrpc.Server
 
   @moduledoc """
   Very dumb genserver to add additional behaviors over GRPC.supervisor.

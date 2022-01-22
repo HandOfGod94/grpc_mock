@@ -22,7 +22,11 @@ defmodule GrpcMock.MixProject do
           include_erts: false
         ]
       ],
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        flags: [:race_conditions],
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+      ]
     ]
   end
 
@@ -64,7 +68,8 @@ defmodule GrpcMock.MixProject do
       {:gun, "~> 2.0.0", hex: :grpc_gun, override: true},
       {:ex_machina, "~> 2.7.0", only: :test},
       {:excoveralls, "~> 0.14.4", only: :test},
-      {:credo, "~> 1.6", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
 
