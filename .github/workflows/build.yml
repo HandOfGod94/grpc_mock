@@ -58,6 +58,13 @@ jobs:
         with:
           elixir-version: ${{ env.ELIXIR_VERSION }}
           otp-version: ${{ env.OTP_VERSION }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            priv/plts
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}
+          restore-keys: ${{ runner.os }}-mix-
       - name: compile assets
         run: mix assets.deploy
 
@@ -96,6 +103,18 @@ jobs:
     steps:
       - name: CI Build Cache
         uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            priv/plts
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}
+          restore-keys: ${{ runner.os }}-mix-
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+          otp-version: ${{ env.OTP_VERSION }}
+      - uses: actions/cache@v2
         with:
           path: |
             deps
