@@ -44,8 +44,6 @@ jobs:
         mix credo
     - name: Run deps vulnerablity checks
       run: mix deps.audit
-    - name: Run dialyzer
-      run: mix dialyzer
     - name: Run all tests
       env:
         MIX_ENV: test
@@ -53,3 +51,5 @@ jobs:
         mix escript.install hex protobuf --force
         echo "${HOME}/.mix/escripts" >> $GITHUB_PATH
         mix coveralls.github
+    - name: Run dialyzer
+      run: mix dialyzer
