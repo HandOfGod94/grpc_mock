@@ -101,20 +101,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: lint
     steps:
-      - name: CI Build Cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            deps
-            priv/plts
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}
-          restore-keys: ${{ runner.os }}-mix-
+      - uses: actions/checkout@v2
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
         with:
           elixir-version: ${{ env.ELIXIR_VERSION }}
           otp-version: ${{ env.OTP_VERSION }}
-      - uses: actions/cache@v2
+      - name: CI Build Cache
+        uses: actions/cache@v2
         with:
           path: |
             deps
