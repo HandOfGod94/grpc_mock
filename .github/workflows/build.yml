@@ -13,7 +13,6 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
     env:
-      MIX_ENV: test
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
@@ -31,8 +30,13 @@ jobs:
           priv/plts
         key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}
         restore-keys: ${{ runner.os }}-mix-
+    - name: Install protoc
+      run: |
+        sudo apt-get update -y && apt-get install -y protobuf-compiler
     - name: Install dependencies
-      run: mix deps.get
+      run: |
+        mix escript.install hex protobuf --force
+        mix deps.get
     - name: Compile assets
       run: mix assets.deploy
     - name: Lint
@@ -44,5 +48,7 @@ jobs:
     - name: Run dialyzer
       run: mix dialyzer
     - name: Run all tests
+      env:
+        MIX_ENV: test
       run: |
         mix coveralls.github
