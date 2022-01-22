@@ -51,4 +51,5 @@ jobs:
       env:
         MIX_ENV: test
       run: |
+        echo "${HOME}/.mix/escripts" >> $GITHUB_PATH
         mix coveralls.github
