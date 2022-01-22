@@ -10,6 +10,13 @@ defmodule GrpcMock.MixProject do
       compilers: Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
       releases: [
         grpc_mock: [
           include_erts: false
@@ -55,7 +62,8 @@ defmodule GrpcMock.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:grpc, "~> 0.5.0-beta.1"},
       {:gun, "~> 2.0.0", hex: :grpc_gun, override: true},
-      {:ex_machina, "~> 2.7.0", only: :test}
+      {:ex_machina, "~> 2.7.0", only: :test},
+      {:excoveralls, "~> 0.14.4", only: :test}
     ]
   end
 
