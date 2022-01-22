@@ -35,7 +35,6 @@ jobs:
         sudo apt-get update -y && sudo apt-get install -y protobuf-compiler
     - name: Install dependencies
       run: |
-        mix escript.install hex protobuf --force
         mix deps.get
     - name: Compile assets
       run: mix assets.deploy
@@ -51,5 +50,6 @@ jobs:
       env:
         MIX_ENV: test
       run: |
+        mix escript.install hex protobuf --force
         echo "${HOME}/.mix/escripts" >> $GITHUB_PATH
         mix coveralls.github
