@@ -1,10 +1,12 @@
 defmodule GrpcMock.Application do
+  # credo:disable-for-this-file
+
   @moduledoc false
 
   use Application
   alias GrpcMock.PbDynamicCompiler
 
-  @impl true
+  @impl Application
   def start(_type, _args) do
     children = [
       # Start the Telemetry supervisor
@@ -27,7 +29,7 @@ defmodule GrpcMock.Application do
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
-  @impl true
+  @impl Application
   def config_change(changed, _new, removed) do
     GrpcMockWeb.Endpoint.config_change(changed, removed)
     :ok

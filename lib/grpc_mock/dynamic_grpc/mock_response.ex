@@ -21,6 +21,7 @@ defmodule GrpcMock.DynamicGrpc.MockResponse do
           trailers: binary() | nil
         }
 
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(mock_response, params \\ %{}) do
     mock_response
     |> cast(params, @required ++ @optional)

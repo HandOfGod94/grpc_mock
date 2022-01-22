@@ -1,4 +1,6 @@
 defmodule GrpcMockWeb.ErrorHelpers do
+  # credo:disable-for-this-file
+
   @moduledoc """
   Conveniences for translating and building error messages.
   """
@@ -17,10 +19,7 @@ defmodule GrpcMockWeb.ErrorHelpers do
     end)
   end
 
-  @doc """
-  Translates an error message.
-  """
-  def translate_error({msg, opts}) do
+  defp translate_error({msg, opts}) do
     # Because the error messages we show in our forms and APIs
     # are defined inside Ecto, we need to translate them dynamically.
     Enum.reduce(opts, msg, fn {key, value}, acc ->

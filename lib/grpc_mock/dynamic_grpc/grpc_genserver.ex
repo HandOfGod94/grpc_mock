@@ -12,12 +12,14 @@ defmodule GrpcMock.DynamicGrpc.GrpcGenServer do
 
   ## client apis
 
+  @spec start_link({Server.t(), atom()}) :: GenServer.on_start()
   def start_link({server, _} = opts) do
     GenServer.start_link(__MODULE__, opts, name: {:via, Registry, {GrpcMock.ServerRegistry, server.id, server}})
   end
 
   ## server apis
 
+  @impl GenServer
   def init({server, endpoint}) do
     GRPC.Server.Supervisor.start_link({endpoint, server.port})
   end

@@ -1,4 +1,6 @@
 defmodule GrpcMockWeb.LiveHelpers do
+  # credo:disable-for-this-file
+
   import Phoenix.LiveView
   import Phoenix.LiveView.Helpers
 

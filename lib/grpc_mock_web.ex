@@ -1,4 +1,6 @@
 defmodule GrpcMockWeb do
+  # credo:disable-for-this-file
+
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, views, channels and so on.

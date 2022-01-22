@@ -1,4 +1,6 @@
 defmodule GrpcMock.Factory do
+  # credo:disable-for-this-file
+
   use ExMachina.Ecto
 
   alias GrpcMock.DynamicGrpc.MockResponse

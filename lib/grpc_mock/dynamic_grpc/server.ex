@@ -5,20 +5,22 @@ defmodule GrpcMock.DynamicGrpc.Server do
 
   @required [:service, :port]
   @optional [:id]
-
   embedded_schema do
     field(:service, :string)
     field(:port, :integer)
     embeds_many(:mock_responses, MockResponse)
   end
 
+  @type id :: String.t()
+
   @type t :: %__MODULE__{
-          id: String.t() | nil,
-          service: String.t(),
-          port: Integer.t(),
-          mock_responses: MockResponse.t()
+          id: id() | nil,
+          service: String.t() | nil,
+          port: Integer.t() | nil,
+          mock_responses: list(MockResponse.t())
         }
 
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(server, params \\ %{}) do
     server
     |> cast(params, @required ++ @optional)
@@ -34,6 +36,7 @@ defmodule GrpcMock.DynamicGrpc.Server do
     |> apply_action(:insert)
   end
 
+  @spec update(t(), map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   def update(server, params) do
     server
     |> changeset(params)

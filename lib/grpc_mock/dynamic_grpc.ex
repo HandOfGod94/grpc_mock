@@ -6,7 +6,7 @@ defmodule GrpcMock.DynamicGrpc do
 
   defmodule StartFailedError do
     defexception [:reason]
-    @impl true
+    @impl Exception
     def message(%{reason: reason}), do: "failed to start server. reason: #{inspect(reason)}"
   end
 
@@ -18,6 +18,7 @@ defmodule GrpcMock.DynamicGrpc do
   {key, pid, serverstrucct} where key == Nanoid
   """
 
+  @spec list_all_servers() :: list(Server.t())
   def list_all_servers do
     match_pattern = {:_, :"$1", :"$2"}
     guards = []
@@ -27,6 +28,7 @@ defmodule GrpcMock.DynamicGrpc do
     Registry.select(@registry, queryspec)
   end
 
+  @spec fetch_server(Server.id()) :: {pid(), Server.t()} | nil
   def fetch_server(id) do
     case Registry.lookup(@registry, id) do
       [{pid, value}] -> {pid, value}
@@ -34,6 +36,7 @@ defmodule GrpcMock.DynamicGrpc do
     end
   end
 
+  @spec start_server(Server.t()) :: {:ok, Server.t()} | {:error, any()}
   def start_server(%Server{} = server) do
     with [_, {endpoint, _}] <- generate_implmentation(server),
          {:ok, _} <- DynamicSupervisor.start_server(server, endpoint) do
@@ -44,6 +47,7 @@ defmodule GrpcMock.DynamicGrpc do
     end
   end
 
+  @spec stop_server(Server.id()) :: {:ok, Server.t()} | {:error, :not_found} | nil
   def stop_server(id) do
     with {pid, server} <- fetch_server(id),
          :ok <- DynamicSupervisor.stop_server(pid) do
@@ -52,11 +56,12 @@ defmodule GrpcMock.DynamicGrpc do
     end
   end
 
+  @spec change_dynamic_server(Server.t(), map()) :: Ecto.Changeset.t()
   def change_dynamic_server(server, params \\ %{}) do
     Server.changeset(server, params)
   end
 
-  def generate_implmentation(%Server{} = server) do
+  defp generate_implmentation(%Server{} = server) do
     with mocks <- create_mocks(server.mock_responses),
          :ok <- accumulate_errors(mocks) do
       {content, _} =

@@ -9,6 +9,7 @@ defmodule GrpcMock.PbDynamicCompiler do
 
   defmodule CodegenError do
     defexception [:reason]
+    @impl Exception
     def message(%{reason: reason}), do: "failed to generate code. reason: #{inspect(reason)}"
   end
 
@@ -16,14 +17,17 @@ defmodule GrpcMock.PbDynamicCompiler do
   ## client apis
   ##############
 
+  @spec start_link(any()) :: GenServer.on_start()
   def start_link(_opts) do
     GenServer.start_link(__MODULE__, MapSet.new(), name: __MODULE__)
   end
 
+  @spec codegen(binary(), binary()) :: :ok
   def codegen(import_path, proto_files_glob) do
     GenServer.cast(__MODULE__, {:codegen, import_path, proto_files_glob})
   end
 
+  @spec available_modules :: MapSet.t()
   def available_modules do
     GenServer.call(__MODULE__, {:available_modules})
   end
@@ -31,11 +35,13 @@ defmodule GrpcMock.PbDynamicCompiler do
   ##############
   ## server apis
   ##############
+  @impl GenServer
   def init(modules) do
     Logger.info("starting dynamic proto compiler")
     {:ok, modules}
   end
 
+  @impl GenServer
   def handle_cast({:codegen, import_path, proto_files_glob}, modules) do
     with :ok <- protoc(import_path, proto_files_glob),
          {:ok, mods} <- load_modules() do
@@ -55,6 +61,7 @@ defmodule GrpcMock.PbDynamicCompiler do
     end
   end
 
+  @impl GenServer
   def handle_call({:available_modules}, _from, modules) do
     {:reply, modules, modules}
   end
@@ -89,7 +96,7 @@ defmodule GrpcMock.PbDynamicCompiler do
     end
   end
 
-  def proto_out_dir! do
+  defp proto_out_dir! do
     Application.fetch_env!(:grpc_mock, :proto_out_dir)
   end
 end
