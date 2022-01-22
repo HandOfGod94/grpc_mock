@@ -8,8 +8,7 @@ config :grpc_mock, GrpcMockWeb.Endpoint,
   server: false
 
 # In test we don't send emails.
-config :grpc_mock, GrpcMock.Mailer,
-  adapter: Swoosh.Adapters.Test
+config :grpc_mock, GrpcMock.Mailer, adapter: Swoosh.Adapters.Test
 
 config :grpc_mock,
   proto_out_dir: System.tmp_dir!()

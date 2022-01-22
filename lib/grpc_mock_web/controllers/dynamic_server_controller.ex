@@ -29,7 +29,7 @@ defmodule GrpcMockWeb.DynamicServerController do
 
       {:error, error} ->
         conn
-        |> put_flash(:error, "Error while stopping server. Reason: #{inspect error}")
+        |> put_flash(:error, "Error while stopping server. Reason: #{inspect(error)}")
         |> redirect(to: Routes.dynamic_server_path(conn, :index))
     end
   end

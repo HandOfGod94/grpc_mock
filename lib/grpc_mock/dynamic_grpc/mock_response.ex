@@ -6,20 +6,20 @@ defmodule GrpcMock.DynamicGrpc.MockResponse do
   @optional [:headers, :trailers]
 
   embedded_schema do
-    field :method, :string
-    field :return_type, :string
-    field :data, :string, default: ""
-    field :headers, :string, default: ""
-    field :trailers, :string, default: ""
+    field(:method, :string)
+    field(:return_type, :string)
+    field(:data, :string, default: "")
+    field(:headers, :string, default: "")
+    field(:trailers, :string, default: "")
   end
 
   @type t :: %__MODULE__{
-    method: String.t(),
-    return_type: String.t(),
-    data: binary(),
-    headers: binary() | nil,
-    trailers: binary() | nil
-  }
+          method: String.t(),
+          return_type: String.t(),
+          data: binary(),
+          headers: binary() | nil,
+          trailers: binary() | nil
+        }
 
   def changeset(mock_response, params \\ %{}) do
     mock_response

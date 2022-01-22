@@ -65,7 +65,11 @@ defmodule GrpcMock.DynamicGrpc.ServerTest do
 
     test "returns error with missing values" do
       assert {:error, changeset} = Server.new(%{})
-      assert Enum.member?(changeset.errors, {:service, {"can't be blank", [validation: :required]}})
+
+      assert Enum.member?(
+               changeset.errors,
+               {:service, {"can't be blank", [validation: :required]}}
+             )
     end
   end
 end

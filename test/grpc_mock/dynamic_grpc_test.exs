@@ -42,7 +42,7 @@ defmodule GrpcMock.DynamicGrpcTest do
       assert res == nil
     end
 
-     test "should return server info if id present" do
+    test "should return server info if id present" do
       {:ok, %Server{id: id} = server} =
         Server.new(%{
           service: "Service",
@@ -61,6 +61,6 @@ defmodule GrpcMock.DynamicGrpcTest do
       {:ok, pid} = Agent.start_link(fn -> %{} end, name: name)
 
       assert {^pid, %Server{id: ^id}} = DynamicGrpc.fetch_server(id)
-     end
+    end
   end
 end

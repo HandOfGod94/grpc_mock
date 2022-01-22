@@ -13,7 +13,7 @@ defmodule GrpcMock.DynamicGrpc.DynamicSupervisor do
 
   def start_server(server, endpoint) do
     spec = {GrpcGenServer, {server, endpoint}}
-    DynamicSupervisor.start_child(__MODULE__,spec)
+    DynamicSupervisor.start_child(__MODULE__, spec)
   end
 
   def stop_server(pid) do

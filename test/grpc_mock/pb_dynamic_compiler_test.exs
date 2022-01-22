@@ -35,7 +35,8 @@ defmodule GrpcMock.PbDynamicCompilerTest do
       assert result == MapSet.new()
     end
 
-    test "compiled_modules state remains unchanged when proto file is invalid", %{import_path: import_path} do
+    test "compiled_modules state remains unchanged when proto file is invalid",
+         %{import_path: import_path} do
       proto_file = "foo.bar"
       PbDynamicCompiler.codegen(import_path, proto_file)
       result = :sys.get_state(PbDynamicCompiler)
@@ -52,7 +53,8 @@ defmodule GrpcMock.PbDynamicCompilerTest do
       # wait till cast call completes
       :sys.get_state(PbDynamicCompiler)
 
-      result = PbDynamicCompiler.available_modules
+      result = PbDynamicCompiler.available_modules()
+
       assert result ==
                MapSet.new([
                  GprcMock.Protos.Helloworld.Greeter.Service,

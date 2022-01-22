@@ -7,19 +7,19 @@ defmodule GrpcMock.DynamicGrpc.Server do
   @optional [:id]
 
   embedded_schema do
-    field :service, :string
-    field :port, :integer
-    embeds_many :mock_responses, MockResponse
+    field(:service, :string)
+    field(:port, :integer)
+    embeds_many(:mock_responses, MockResponse)
   end
 
   @type t :: %__MODULE__{
-    id: String.t() | nil,
-    service: String.t(),
-    port: Integer.t(),
-    mock_responses: MockResponse.t()
-  }
+          id: String.t() | nil,
+          service: String.t(),
+          port: Integer.t(),
+          mock_responses: MockResponse.t()
+        }
 
-  def changeset(server, params\\%{}) do
+  def changeset(server, params \\ %{}) do
     server
     |> cast(params, @required ++ @optional)
     |> cast_embed(:mock_responses, required: true)

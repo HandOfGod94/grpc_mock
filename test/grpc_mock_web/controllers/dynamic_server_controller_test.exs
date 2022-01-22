@@ -26,7 +26,7 @@ defmodule GrpcMockWeb.DynamicServerControllerTest do
     end
 
     test "render 404 when server is absent",
-      %{conn: conn, dynamic_server: dynamic_server} do
+         %{conn: conn, dynamic_server: dynamic_server} do
       invalid_server = %{dynamic_server | id: "foobar"}
       conn = get(conn, Routes.dynamic_server_path(conn, :show, invalid_server))
       assert redirected_to(conn) == Routes.dynamic_server_path(conn, :index)

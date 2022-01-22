@@ -13,9 +13,7 @@ defmodule GrpcMock.DynamicGrpc.GrpcGenServer do
   ## client apis
 
   def start_link({server, _} = opts) do
-    GenServer.start_link(__MODULE__, opts,
-      name: {:via, Registry, {GrpcMock.ServerRegistry, server.id, server}}
-    )
+    GenServer.start_link(__MODULE__, opts, name: {:via, Registry, {GrpcMock.ServerRegistry, server.id, server}})
   end
 
   ## server apis
