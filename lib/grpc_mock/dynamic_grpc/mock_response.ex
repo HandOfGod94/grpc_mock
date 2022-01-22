@@ -16,9 +16,9 @@ defmodule GrpcMock.DynamicGrpc.MockResponse do
   @type t :: %__MODULE__{
     method: String.t(),
     return_type: String.t(),
-    data: %{binary() => binary()},
-    headers: %{binary() => binary()} | nil,
-    trailers: %{binary() => binary()} | nil
+    data: binary(),
+    headers: binary() | nil,
+    trailers: binary() | nil
   }
 
   def changeset(mock_response, params \\ %{}) do

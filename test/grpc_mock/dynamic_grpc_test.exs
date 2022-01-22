@@ -22,12 +22,12 @@ defmodule GrpcMock.DynamicGrpcTest do
             %{
               method: "transfer",
               return_type: "TransactionResponse",
-              data: %{success: false}
+              data: Jason.encode!(%{success: false})
             }
           ]
         })
 
-        # register with process
+      # register with process
       name = {:via, Registry, {@registry, id, server}}
       {:ok, pid} = Agent.start_link(fn -> %{} end, name: name)
 
@@ -36,7 +36,7 @@ defmodule GrpcMock.DynamicGrpcTest do
     end
   end
 
-  describe "fetch_server_info/1" do
+  describe "fetch_server/1" do
     test "should return nil when id is not present" do
       res = DynamicGrpc.fetch_server("foo")
       assert res == nil
@@ -51,7 +51,7 @@ defmodule GrpcMock.DynamicGrpcTest do
             %{
               method: "transfer",
               return_type: "TransactionResponse",
-              data: %{success: false}
+              data: Jason.encode!(%{success: false})
             }
           ]
         })

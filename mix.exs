@@ -54,7 +54,8 @@ defmodule GrpcMock.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:grpc, "~> 0.5.0-beta.1"},
-      {:gun, "~> 2.0.0", hex: :grpc_gun, override: true}
+      {:gun, "~> 2.0.0", hex: :grpc_gun, override: true},
+      {:ex_machina, "~> 2.7.0", only: :test}
     ]
   end
 

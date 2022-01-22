@@ -1,84 +1,70 @@
 defmodule GrpcMockWeb.DynamicServerControllerTest do
   use GrpcMockWeb.ConnCase
+  import GrpcMock.Factory
+  alias GrpcMock.DynamicGrpc
+  alias GrpcMock.PbDynamicCompiler
 
-  import GrpcMock.DynamicGrpcFixtures
-
-  @create_attrs %{mock_responses: %{}, port: 42, service: "some service"}
-  @update_attrs %{mock_responses: %{}, port: 43, service: "some updated service"}
-  @invalid_attrs %{mock_responses: nil, port: nil, service: nil}
+  @registry GrpcMock.ServerRegistry
 
   describe "index" do
     test "lists all dynamic_servers", %{conn: conn} do
       conn = get(conn, Routes.dynamic_server_path(conn, :index))
-      assert html_response(conn, 200) =~ "Listing Dynamic servers"
+      assert html_response(conn, 200) =~ "GRPC Servers"
     end
   end
 
-  describe "new dynamic_server" do
-    test "renders form", %{conn: conn} do
-      conn = get(conn, Routes.dynamic_server_path(conn, :new))
-      assert html_response(conn, 200) =~ "New Dynamic server"
-    end
-  end
-
-  describe "create dynamic_server" do
-    test "redirects to show when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.dynamic_server_path(conn, :create), dynamic_server: @create_attrs)
-
-      assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == Routes.dynamic_server_path(conn, :show, id)
-
-      conn = get(conn, Routes.dynamic_server_path(conn, :show, id))
-      assert html_response(conn, 200) =~ "Show Dynamic server"
-    end
-
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.dynamic_server_path(conn, :create), dynamic_server: @invalid_attrs)
-      assert html_response(conn, 200) =~ "New Dynamic server"
-    end
-  end
-
-  describe "edit dynamic_server" do
+  describe "show" do
     setup [:create_dynamic_server]
 
-    test "renders form for editing chosen dynamic_server", %{conn: conn, dynamic_server: dynamic_server} do
-      conn = get(conn, Routes.dynamic_server_path(conn, :edit, dynamic_server))
-      assert html_response(conn, 200) =~ "Edit Dynamic server"
-    end
-  end
-
-  describe "update dynamic_server" do
-    setup [:create_dynamic_server]
-
-    test "redirects when data is valid", %{conn: conn, dynamic_server: dynamic_server} do
-      conn = put(conn, Routes.dynamic_server_path(conn, :update, dynamic_server), dynamic_server: @update_attrs)
-      assert redirected_to(conn) == Routes.dynamic_server_path(conn, :show, dynamic_server)
-
+    test "show dynamic server details when server is present",
+         %{conn: conn, dynamic_server: dynamic_server} do
       conn = get(conn, Routes.dynamic_server_path(conn, :show, dynamic_server))
-      assert html_response(conn, 200) =~ "some updated service"
+      resp = html_response(conn, 200)
+      assert resp =~ "Dynamic Server Details"
+      assert resp =~ dynamic_server.service
+      assert resp =~ "#{dynamic_server.port}"
     end
 
-    test "renders errors when data is invalid", %{conn: conn, dynamic_server: dynamic_server} do
-      conn = put(conn, Routes.dynamic_server_path(conn, :update, dynamic_server), dynamic_server: @invalid_attrs)
-      assert html_response(conn, 200) =~ "Edit Dynamic server"
+    test "render 404 when server is absent",
+      %{conn: conn, dynamic_server: dynamic_server} do
+      invalid_server = %{dynamic_server | id: "foobar"}
+      conn = get(conn, Routes.dynamic_server_path(conn, :show, invalid_server))
+      assert redirected_to(conn) == Routes.dynamic_server_path(conn, :index)
+      assert get_flash(conn, :error) == "Server not found"
     end
   end
 
-  describe "delete dynamic_server" do
-    setup [:create_dynamic_server]
+  describe "stop dynamic_server" do
+    setup [:start_pb_dynamic_compiler, :create_dynamic_server]
 
-    test "deletes chosen dynamic_server", %{conn: conn, dynamic_server: dynamic_server} do
-      conn = delete(conn, Routes.dynamic_server_path(conn, :delete, dynamic_server))
+    test "stop and delete chosen dynamic_server", %{conn: conn} do
+      server = build(:server, id: "start-wars-#{Nanoid.generate()}")
+      {:ok, _} = DynamicGrpc.start_server(server)
+
+      conn = delete(conn, Routes.dynamic_server_path(conn, :delete, server))
       assert redirected_to(conn) == Routes.dynamic_server_path(conn, :index)
-
-      assert_error_sent 404, fn ->
-        get(conn, Routes.dynamic_server_path(conn, :show, dynamic_server))
-      end
+      assert get_flash(conn, :info) == "Dynamic server stopped successfully."
     end
+  end
+
+  defp start_pb_dynamic_compiler(_) do
+    start_supervised(PbDynamicCompiler)
+
+    import_path = Path.join([File.cwd!(), "test", "support", "fixtures"])
+    PbDynamicCompiler.codegen(import_path, "helloworld.proto")
+    # wait till cast request completes
+    :sys.get_state(PbDynamicCompiler)
+
+    :ok
   end
 
   defp create_dynamic_server(_) do
-    dynamic_server = dynamic_server_fixture()
-    %{dynamic_server: dynamic_server}
+    server = build(:server)
+
+    # register with process
+    name = {:via, Registry, {@registry, server.id, server}}
+    {:ok, _} = Agent.start_link(fn -> %{} end, name: name)
+
+    %{dynamic_server: server}
   end
 end

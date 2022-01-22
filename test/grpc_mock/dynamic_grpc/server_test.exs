@@ -38,7 +38,7 @@ defmodule GrpcMock.DynamicGrpc.ServerTest do
             %{
               method: "foo",
               return_type: "bar",
-              data: %{success: true}
+              data: Jason.encode!(%{success: true})
             }
           ]
         })
@@ -57,7 +57,7 @@ defmodule GrpcMock.DynamicGrpc.ServerTest do
                    %{
                      method: "foo",
                      return_type: "bar",
-                     data: %{success: true}
+                     data: Jason.encode!(%{success: true})
                    }
                  ]
                })

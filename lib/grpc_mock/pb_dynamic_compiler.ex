@@ -4,7 +4,6 @@ defmodule GrpcMock.PbDynamicCompiler do
   alias Phoenix.PubSub
   alias GrpcMock.PbDynamicCompiler.CompileStatus
 
-  @out_dir Application.compile_env(:grpc_mock, :proto_out_dir)
   @compile_status_topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
   @pubsub GrpcMock.PubSub
 
@@ -45,6 +44,8 @@ defmodule GrpcMock.PbDynamicCompiler do
       {:noreply, MapSet.union(mods, modules)}
     else
       {:error, %CodegenError{} = error} ->
+        Logger.error(Exception.message(error))
+
         PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{
           error: error,
           status: :failed
@@ -63,7 +64,7 @@ defmodule GrpcMock.PbDynamicCompiler do
 
     try do
       compiled_modules =
-        "#{@out_dir}/**/*.ex"
+        "#{proto_out_dir!()}/**/*.ex"
         |> Path.wildcard()
         |> Enum.map(&Code.compile_file/1)
         |> List.flatten()
@@ -79,12 +80,16 @@ defmodule GrpcMock.PbDynamicCompiler do
   defp protoc(import_path, proto_files_glob) do
     System.cmd(
       "protoc",
-      ~w(--proto_path=#{import_path} --elixir_opt=package_prefix=GprcMock.Protos --elixir_out=plugins=grpc:#{@out_dir} #{proto_files_glob}),
+      ~w(--proto_path=#{import_path} --elixir_opt=package_prefix=GprcMock.Protos --elixir_out=plugins=grpc:#{proto_out_dir!()} #{proto_files_glob}),
       stderr_to_stdout: true
     )
     |> case do
       {_, 0} -> :ok
       {msg, _} -> {:error, %CodegenError{reason: msg}}
     end
+  end
+
+  def proto_out_dir! do
+    Application.fetch_env!(:grpc_mock, :proto_out_dir)
   end
 end

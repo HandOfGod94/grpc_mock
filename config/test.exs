@@ -11,6 +11,9 @@ config :grpc_mock, GrpcMockWeb.Endpoint,
 config :grpc_mock, GrpcMock.Mailer,
   adapter: Swoosh.Adapters.Test
 
+config :grpc_mock,
+  proto_out_dir: System.tmp_dir!()
+
 # Print only warnings and errors during test
 config :logger, level: :warn
 
