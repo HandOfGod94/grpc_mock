@@ -69,7 +69,8 @@ defmodule GrpcMock.MixProject do
       {:ex_machina, "~> 2.7.0", only: :test},
       {:excoveralls, "~> 0.14.4", only: :test},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:mix_audit, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

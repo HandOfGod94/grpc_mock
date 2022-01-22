@@ -1,0 +1,48 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  ELIXIR_VERSION: 1.12.3
+  OTP_VERSION: 23.3
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: ${{ env.ELIXIR_VERSION }}
+        otp-version: ${{ env.OTP_VERSION }}
+    - name: CI Build Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          deps
+          priv/plts
+        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}
+        restore-keys: ${{ runner.os }}-mix-
+    - name: Install dependencies
+      run: mix deps.get
+    - name: Compile assets
+      run: mix assets.deploy
+    - name: Lint
+      run: |
+        mix format --check-formatted
+        mix credo
+    - name: Run deps vulnerablity checks
+      run: mix deps.audit
+    - name: Run dialyzer
+      run: mix dialyzer
+    - name: Run all tests
+      run: |
+        mix coveralls.github
