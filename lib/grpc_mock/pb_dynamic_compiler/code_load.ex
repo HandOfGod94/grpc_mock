@@ -11,7 +11,7 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoad do
   alias Phoenix.PubSub
   alias GrpcMock.PbDynamicCompiler.CompileStatus
 
-  defmodule CodegenError do
+  defmodule CodeLoadError do
     defexception [:reason]
     @impl Exception
     def message(%{reason: reason}), do: "failed to generate code. reason: #{inspect(reason)}"
@@ -29,13 +29,13 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoad do
       PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{status: :finished})
       Logger.info("loading of modules was successful")
     else
-      {:error, %CodegenError{} = error} ->
+      {:error, %CodeLoadError{} = error} ->
         status = %CompileStatus{error: error, status: :failed}
         PubSub.broadcast!(@pubsub, @compile_status_topic, status)
         Logger.error(Exception.message(error))
 
       {:aborted, reason} ->
-        status = %CompileStatus{error: %CodegenError{reason: reason}, status: :failed}
+        status = %CompileStatus{error: %CodeLoadError{reason: reason}, status: :failed}
         PubSub.broadcast!(@pubsub, @compile_status_topic, status)
         Logger.error("failed to save modules in store. reason: #{inspect(reason)}")
     end
@@ -60,12 +60,14 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoad do
         |> Path.wildcard()
         |> Enum.map(&Code.compile_file/1)
         |> List.flatten()
-        |> Keyword.keys()
-        |> MapSet.new()
 
-      {:ok, compiled_modules}
+      Enum.each(compiled_modules, fn {module_name, module_code} ->
+        remote_load(module_name, dynamic_module_filename(module_name), module_code)
+      end)
+
+      {:ok, Keyword.keys(compiled_modules)}
     catch
-      error -> {:error, %CodegenError{reason: error}}
+      error -> {:error, %CodeLoadError{reason: error}}
     end
   end
 
@@ -86,8 +88,16 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoad do
     )
     |> case do
       {_, 0} -> :ok
-      {msg, _} -> {:error, %CodegenError{reason: msg}}
+      {msg, _} -> {:error, %CodeLoadError{reason: msg}}
     end
+  end
+
+  defp dynamic_module_filename(module) do
+    module
+    |> Atom.to_string()
+    |> String.replace(".", "_")
+    |> String.downcase()
+    |> to_charlist()
   end
 
   defp proto_out_dir!, do: Application.fetch_env!(:grpc_mock, :proto_out_dir)
