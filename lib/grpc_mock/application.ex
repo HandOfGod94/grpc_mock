@@ -4,7 +4,6 @@ defmodule GrpcMock.Application do
   @moduledoc false
 
   use Application
-  alias GrpcMock.PbDynamicCompiler
 
   @impl Application
   def start(_type, _args) do
@@ -27,7 +26,7 @@ defmodule GrpcMock.Application do
       # Start the Endpoint (http/https)
       GrpcMockWeb.Endpoint,
       # Start a worker by calling: GrpcMock.Worker.start_link(arg)
-      PbDynamicCompiler,
+      {Task.Supervisor, name: GrpcMock.TaskSupervisor},
       {Registry, keys: :unique, name: GrpcMock.ServerRegistry},
       {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor}
     ]

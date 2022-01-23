@@ -21,7 +21,7 @@ defmodule GrpcMockWeb.ProtocModuleLive.Index do
 
     {:noreply,
      socket
-     |> put_flash(:info, "Started compiling")
+     |> put_flash(:info, "Compilation in progress")
      |> assign(:protoc_modules, list_protoc_modules())}
   end
 
