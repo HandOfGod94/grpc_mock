@@ -1,6 +1,4 @@
 defmodule GrpcMock.PbDynamicCompiler do
-  use GenServer
-
   require Logger
 
   import GrpcMock.PbDynamicCompiler.ModuleStore
@@ -10,6 +8,7 @@ defmodule GrpcMock.PbDynamicCompiler do
 
   @compile_status_topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
   @pubsub GrpcMock.PubSub
+  @task_supervisor GrpcMock.TaskSupervisor
 
   defmodule CodegenError do
     defexception [:reason]
@@ -17,59 +16,30 @@ defmodule GrpcMock.PbDynamicCompiler do
     def message(%{reason: reason}), do: "failed to generate code. reason: #{inspect(reason)}"
   end
 
-  ##############
-  ## client apis
-  ##############
-
-  @spec start_link(any()) :: GenServer.on_start()
-  def start_link(_opts) do
-    GenServer.start_link(__MODULE__, MapSet.new(), name: __MODULE__)
-  end
-
-  @spec codegen(binary(), binary()) :: :ok
+  @spec codegen(binary(), binary()) :: DynamicSupervisor.on_start_child()
   def codegen(import_path, proto_files_glob) do
-    GenServer.cast(__MODULE__, {:codegen, import_path, proto_files_glob})
+    Task.Supervisor.start_child(@task_supervisor, fn ->
+      with :ok <- protoc(import_path, proto_files_glob),
+           {:ok, mods} <- load_modules() do
+        save_modules(mods)
+        PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{status: :finished})
+        Logger.info("loading of modules was successful")
+      else
+        {:error, %CodegenError{} = error} ->
+          Logger.error(Exception.message(error))
+
+          PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{
+            error: error,
+            status: :failed
+          })
+      end
+    end)
   end
 
   @spec available_modules :: MapSet.t()
   def available_modules do
-    GenServer.call(__MODULE__, {:available_modules})
-  end
-
-  ##############
-  ## server apis
-  ##############
-  @impl GenServer
-  def init(modules) do
-    Logger.info("starting dynamic proto compiler")
-    {:ok, modules}
-  end
-
-  @impl GenServer
-  def handle_cast({:codegen, import_path, proto_files_glob}, modules) do
-    with :ok <- protoc(import_path, proto_files_glob),
-         {:ok, mods} <- load_modules() do
-      save_modules(mods)
-      Logger.info("loading of modules was successful")
-      PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{status: :finished})
-      {:noreply, MapSet.union(mods, modules)}
-    else
-      {:error, %CodegenError{} = error} ->
-        Logger.error(Exception.message(error))
-
-        PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{
-          error: error,
-          status: :failed
-        })
-
-        {:noreply, modules}
-    end
-  end
-
-  @impl GenServer
-  def handle_call({:available_modules}, _from, modules) do
     {:atomic, list_of_modules} = :mnesia.transaction(fn -> :mnesia.all_keys(:module) end)
-    {:reply, list_of_modules, modules}
+    list_of_modules
   end
 
   defp load_modules do
