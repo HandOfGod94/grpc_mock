@@ -36,7 +36,7 @@ defmodule GrpcMock.MixProject do
   def application do
     [
       mod: {GrpcMock.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:mnesia, :logger, :runtime_tools]
     ]
   end
 
@@ -67,6 +67,7 @@ defmodule GrpcMock.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:grpc, "~> 0.5.0-beta.1"},
+      {:mnesiac, "~> 0.3.9"},
       {:gun, "~> 2.0.0", hex: :grpc_gun, override: true},
       {:ex_machina, "~> 2.7.0", only: :test},
       {:excoveralls, "~> 0.14.4", only: :test},

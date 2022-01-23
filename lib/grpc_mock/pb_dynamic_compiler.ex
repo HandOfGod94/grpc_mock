@@ -1,6 +1,10 @@
 defmodule GrpcMock.PbDynamicCompiler do
   use GenServer
+
   require Logger
+
+  import GrpcMock.PbDynamicCompiler.ModuleStore
+
   alias Phoenix.PubSub
   alias GrpcMock.PbDynamicCompiler.CompileStatus
 
@@ -45,6 +49,7 @@ defmodule GrpcMock.PbDynamicCompiler do
   def handle_cast({:codegen, import_path, proto_files_glob}, modules) do
     with :ok <- protoc(import_path, proto_files_glob),
          {:ok, mods} <- load_modules() do
+      save_modules(mods)
       Logger.info("loading of modules was successful")
       PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{status: :finished})
       {:noreply, MapSet.union(mods, modules)}
@@ -63,7 +68,8 @@ defmodule GrpcMock.PbDynamicCompiler do
 
   @impl GenServer
   def handle_call({:available_modules}, _from, modules) do
-    {:reply, modules, modules}
+    {:atomic, list_of_modules} = :mnesia.transaction(fn -> :mnesia.all_keys(:module) end)
+    {:reply, list_of_modules, modules}
   end
 
   defp load_modules do
@@ -82,6 +88,15 @@ defmodule GrpcMock.PbDynamicCompiler do
     catch
       error -> {:error, %CodegenError{reason: error}}
     end
+  end
+
+  defp save_modules(modules) do
+    :mnesia.transaction(fn ->
+      Enum.each(modules, fn module ->
+        record = module(id: module, name: module)
+        :mnesia.write(record)
+      end)
+    end)
   end
 
   defp protoc(import_path, proto_files_glob) do
