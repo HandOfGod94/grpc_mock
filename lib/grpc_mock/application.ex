@@ -8,14 +8,18 @@ defmodule GrpcMock.Application do
 
   @impl Application
   def start(_type, _args) do
+    hosts = [:"main@Gahan-Rakholia", :"other@Gahan-Rakholia"]
+
     topologies = [
-      example: [
-        strategy: Elixir.Cluster.Strategy.LocalEpmd
+      grpc_mock: [
+        strategy: Cluster.Strategy.Epmd,
+        config: [hosts: hosts]
       ]
     ]
 
     children = [
       {Cluster.Supervisor, [topologies, [name: GrpcMock.ClusterSupervisor]]},
+      {Mnesiac.Supervisor, [hosts, [name: GrpcMock.MnesiacSupervisor]]},
       # Start the Telemetry supervisor
       GrpcMockWeb.Telemetry,
       # Start the PubSub system
