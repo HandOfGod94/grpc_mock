@@ -10,6 +10,12 @@ defmodule GrpcMock.DynamicGrpc do
     def message(%{reason: reason}), do: "failed to start server. reason: #{inspect(reason)}"
   end
 
+  defmodule MockgenError do
+    defexception [:reason]
+    @impl Exception
+    def message(%{reason: reason}), do: "failed to create mock. reason: #{inspect(reason)}"
+  end
+
   @registry GrpcMock.ServerRegistry
   @otp_app :grpc_mock
 
@@ -42,6 +48,7 @@ defmodule GrpcMock.DynamicGrpc do
          {:ok, _} <- DynamicSupervisor.start_server(server, endpoint) do
       {:ok, server}
     else
+      {:error, %MockgenError{} = error} -> {:error, error}
       {:error, %Ecto.Changeset{} = errors} -> {:error, errors}
       {:error, error} -> {:error, %StartFailedError{reason: error}}
     end
@@ -62,8 +69,9 @@ defmodule GrpcMock.DynamicGrpc do
   end
 
   defp generate_implmentation(%Server{} = server) do
-    with mocks <- create_mocks(server.mock_responses),
-         :ok <- accumulate_errors(mocks) do
+    try do
+      mocks = set_method_body!(server.mock_responses)
+
       {content, _} =
         :code.priv_dir(@otp_app)
         |> Path.join("dynamic_server.eex")
@@ -71,6 +79,8 @@ defmodule GrpcMock.DynamicGrpc do
         |> Code.eval_quoted(app: app_name(server.service), service: server.service, mocks: mocks)
 
       Code.compile_string(content)
+    rescue
+      error -> {:error, %MockgenError{reason: error}}
     end
   end
 
@@ -80,30 +90,11 @@ defmodule GrpcMock.DynamicGrpc do
     |> Enum.at(-2)
   end
 
-  defp create_mocks(mock_responses) do
+  defp set_method_body!(mock_responses) do
     Enum.reduce(mock_responses, [], fn resp, acc ->
-      case Jason.decode(resp.data, keys: :atoms) do
-        {:ok, data} ->
-          stub = {resp.method, resp.return_type, inspect(data)}
-          [stub | acc]
-
-        {:error, error} ->
-          [{:error, error} | acc]
-      end
+      data = Jason.decode!(resp.data, keys: :atoms)
+      stub = {resp.method, resp.return_type, inspect(data)}
+      [stub | acc]
     end)
-  end
-
-  defp accumulate_errors(mocks) do
-    errors =
-      Enum.reduce(mocks, [], fn
-        {:error, error}, acc -> acc ++ [error]
-        _otherwise, acc -> acc
-      end)
-
-    if errors != [] do
-      {:error, errors}
-    else
-      :ok
-    end
   end
 end

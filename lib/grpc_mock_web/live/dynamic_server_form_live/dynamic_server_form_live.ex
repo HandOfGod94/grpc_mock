@@ -43,7 +43,7 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
         {:noreply, assign(socket, changeset: changeset)}
 
       {:error, error} ->
-        {:noreply, assign(socket, :errors, Exception.message(error))}
+        {:noreply, assign(socket, errors: Exception.message(error))}
     end
   end
 
