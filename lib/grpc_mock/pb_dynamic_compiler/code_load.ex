@@ -33,11 +33,13 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoad do
         status = %CompileStatus{error: error, status: :failed}
         PubSub.broadcast!(@pubsub, @compile_status_topic, status)
         Logger.error(Exception.message(error))
+        {:error, error}
 
       {:aborted, reason} ->
         status = %CompileStatus{error: %CodeLoadError{reason: reason}, status: :failed}
         PubSub.broadcast!(@pubsub, @compile_status_topic, status)
         Logger.error("failed to save modules in store. reason: #{inspect(reason)}")
+        {:error, %CodeLoadError{reason: reason}}
     end
   end
 
