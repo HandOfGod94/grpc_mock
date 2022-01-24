@@ -44,7 +44,11 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoad do
   @doc """
   Loads dynamically generated module to all the remote node
   """
-  @spec remote_load(atom(), charlist(), binary()) :: list(rpc_call_result())
+  @spec remote_load(atom(), charlist() | nil, binary()) :: list(rpc_call_result())
+  def remote_load(module_name, module_code) do
+    remote_load(module_name, dynamic_module_filename(module_name), module_code)
+  end
+
   def remote_load(module_name, filename, module_code) when is_list(filename) do
     for node <- Node.list() do
       :rpc.call(node, :code, :load_binary, [module_name, filename, module_code])

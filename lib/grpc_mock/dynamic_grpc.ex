@@ -1,6 +1,7 @@
 defmodule GrpcMock.DynamicGrpc do
   alias GrpcMock.DynamicGrpc.Server
   alias GrpcMock.DynamicGrpc.DynamicSupervisor
+  alias GrpcMock.PbDynamicCompiler.CodeLoad
 
   require Logger
 
@@ -45,7 +46,7 @@ defmodule GrpcMock.DynamicGrpc do
   @spec start_server(Server.t()) :: {:ok, Server.t()} | {:error, any()}
   def start_server(%Server{} = server) do
     with [_, {endpoint, _}] <- generate_implmentation(server),
-         {:ok, _} <- DynamicSupervisor.start_server(server, endpoint) do
+         {:ok, _} <- Swarm.register_name(server.id, DynamicSupervisor, :start_server, [server, endpoint]) do
       {:ok, server}
     else
       {:error, %MockgenError{} = error} -> {:error, error}
@@ -78,7 +79,13 @@ defmodule GrpcMock.DynamicGrpc do
         |> EEx.compile_file()
         |> Code.eval_quoted(app: app_name(server.service), service: server.service, mocks: mocks)
 
-      Code.compile_string(content)
+      content
+      |> Code.compile_string()
+      |> tap(
+        &Enum.each(&1, fn {module_name, module_code} ->
+          CodeLoad.remote_load(module_name, module_code)
+        end)
+      )
     rescue
       error -> {:error, %MockgenError{reason: error}}
     end

@@ -36,7 +36,7 @@ defmodule GrpcMock.MixProject do
   def application do
     [
       mod: {GrpcMock.Application, []},
-      extra_applications: [:mnesia, :logger, :runtime_tools]
+      extra_applications: [:libcluster, :swarm, :mnesia, :logger, :runtime_tools]
     ]
   end
 
