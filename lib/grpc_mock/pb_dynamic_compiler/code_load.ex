@@ -22,6 +22,8 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoad do
   @pubsub GrpcMock.PubSub
   @compile_status_topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
 
+  @spec load_modules_from_proto(filepath, glob_pattern) :: :ok | {:error, Exception.t()}
+        when filepath: binary(), glob_pattern: binary()
   def load_modules_from_proto(import_path, proto_file_glob) do
     with :ok <- protoc(import_path, proto_file_glob),
          {:ok, mods} <- load_modules(),
@@ -46,11 +48,12 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoad do
   @doc """
   Loads dynamically generated module to all the remote node
   """
-  @spec remote_load(atom(), charlist() | nil, binary()) :: list(rpc_call_result())
+  @spec remote_load(atom(), binary()) :: list(rpc_call_result())
   def remote_load(module_name, module_code) do
     remote_load(module_name, dynamic_module_filename(module_name), module_code)
   end
 
+  @spec remote_load(atom(), charlist(), binary()) :: list(rpc_call_result())
   def remote_load(module_name, filename, module_code) when is_list(filename) do
     for node <- Node.list() do
       :rpc.call(node, :code, :load_binary, [module_name, filename, module_code])

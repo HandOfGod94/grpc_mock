@@ -10,10 +10,12 @@ defmodule GrpcMock.MnesiaSyncTask do
   application is starting up.
   """
 
+  @spec start_link(term()) :: {:ok, pid()}
   def start_link(arg) do
     Task.start_link(__MODULE__, :run, [arg])
   end
 
+  @spec run(any()) :: :ok | {:error, term()}
   def run(_args) do
     Node.list()
     |> Enum.at(0)

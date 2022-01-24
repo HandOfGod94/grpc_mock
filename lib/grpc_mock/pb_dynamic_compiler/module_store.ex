@@ -12,6 +12,7 @@ defmodule GrpcMock.PbDynamicCompiler.ModuleStore do
     name: nil
   )
 
+  @impl Mnesiac.Store
   def store_options do
     [
       record_name: :module,
