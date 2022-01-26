@@ -1,9 +1,8 @@
 defmodule GrpcMock.DynamicGrpc do
-  alias Horde.Registry
+  alias Registry
   alias GrpcMock.DynamicGrpc.Server
   alias GrpcMock.DynamicGrpc.DynamicSupervisor
-  alias GrpcMock.PbDynamicCompiler.CodeLoad
-  alias GrpcMock.CodegenServer
+  alias GrpcMock.Codegen.EExLoader
 
   require Logger
 
@@ -48,7 +47,7 @@ defmodule GrpcMock.DynamicGrpc do
   @spec start_server(Server.t()) :: {:ok, Server.t()} | {:error, any()}
   def start_server(%Server{} = server) do
     with [_, {endpoint, _}] <- generate_implmentation(server),
-         {:ok, _} <- Swarm.register_name(server.id, DynamicSupervisor, :start_server, [server, endpoint]) do
+         :ok <- start_grpc_server(server, endpoint, Node.list()) do
       {:ok, server}
     else
       {:error, %MockgenError{} = error} -> {:error, error}
@@ -57,13 +56,41 @@ defmodule GrpcMock.DynamicGrpc do
     end
   end
 
+  def start_grpc_server(server, endpoint, nodes) do
+    nodes = [node() | nodes]
+
+    nodes
+    |> Enum.with_index()
+    |> Enum.each(fn {node, idx} ->
+      ## HACK: for now it's just incrementing port number, so in local it doesn't clash
+      server = %{server | port: server.port + idx}
+
+      Node.spawn(node, fn ->
+        {:ok, pid} = DynamicSupervisor.start_server(server, endpoint)
+        :pg.join(server.id, pid)
+      end)
+    end)
+  end
+
   @spec stop_server(Server.id()) :: {:ok, Server.t()} | {:error, :not_found} | nil
   def stop_server(id) do
-    with {pid, server} <- fetch_server(id),
-         :ok <- DynamicSupervisor.stop_server(pid) do
+    with {_pid, server} <- fetch_server(id),
+         :ok <- stop_on_all_nodes(id) do
       Logger.info("successfully stopped server")
       {:ok, server}
     end
+  end
+
+  defp stop_on_all_nodes(id) do
+    nodes = [node() | Node.list()]
+
+    nodes
+    |> Enum.each(fn node ->
+      Node.spawn(node, fn ->
+        owner_node_pid = :pg.get_local_members(id) |> Enum.at(0)
+        DynamicSupervisor.stop_server(owner_node_pid)
+      end)
+    end)
   end
 
   @spec change_dynamic_server(Server.t(), map()) :: Ecto.Changeset.t()
@@ -74,12 +101,10 @@ defmodule GrpcMock.DynamicGrpc do
   defp generate_implmentation(%Server{} = server) do
     try do
       mocks = set_method_body!(server.mock_responses)
+      tempate = :code.priv_dir(@otp_app) |> Path.join("dynamic_server.eex")
+      bindings = [app: app_name(server.service), service: server.service, mocks: mocks]
 
-      CodegenServer.codegen(
-        {:eex,
-         template: "dynamic_server.eex",
-         bindings: [app: app_name(server.service), service: server.service, mocks: mocks]}
-      )
+      EExLoader.load_modules(tempate, bindings)
     rescue
       error -> {:error, %MockgenError{reason: error}}
     end

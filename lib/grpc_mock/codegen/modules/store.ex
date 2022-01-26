@@ -30,7 +30,7 @@ defmodule GrpcMock.Codegen.Modules.Store do
     [
       record_name: @table,
       attributes: dyn_module(dyn_module()) |> Keyword.keys(),
-      index: [:name],
+      index: [],
       ram_copies: [node()]
     ]
   end

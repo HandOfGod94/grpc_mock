@@ -36,7 +36,7 @@ defmodule GrpcMock.MixProject do
   def application do
     [
       mod: {GrpcMock.Application, []},
-      extra_applications: [:libcluster, :swarm, :mnesia, :logger, :runtime_tools]
+      extra_applications: [:libcluster, :mnesia, :logger, :runtime_tools]
     ]
   end
 
@@ -59,7 +59,6 @@ defmodule GrpcMock.MixProject do
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.6"},
       {:libcluster, "~> 3.3.1"},
-      {:swarm, "~> 3.4.0"},
       {:esbuild, "~> 0.3", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.3"},
       {:telemetry_metrics, "~> 0.6"},
@@ -68,7 +67,6 @@ defmodule GrpcMock.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:grpc, "~> 0.5.0-beta.1"},
       {:mnesiac, "~> 0.3.9"},
-      {:horde, "~> 0.8.6"},
       {:gun, "~> 2.0.0", hex: :grpc_gun, override: true},
       {:ex_machina, "~> 2.7.0", only: :test},
       {:excoveralls, "~> 0.14.4", only: :test},

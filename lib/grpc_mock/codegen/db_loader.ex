@@ -6,9 +6,11 @@ defmodule GrpcMock.Codegen.DbLoader do
   alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
   alias GrpcMock.Extension.Code
 
+  @table :dyn_module
+
   def load_modules do
     Logger.info("loading modules from mnesia")
-    :mnesia.wait_for_tables([:dyn_module], 10_000)
+    :mnesia.wait_for_tables([@table], 10_000)
 
     for key <- ModuleRepo.all_dirty() do
       {:atomic, record} = ModuleRepo.one(key)

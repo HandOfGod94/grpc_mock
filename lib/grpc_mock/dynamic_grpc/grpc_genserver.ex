@@ -1,7 +1,7 @@
 defmodule GrpcMock.DynamicGrpc.GrpcGenServer do
   use GenServer, restart: :transient
   alias GrpcMock.DynamicGrpc.Server
-  alias Horde.Registry
+  alias Registry
 
   @moduledoc """
   Very dumb genserver to add additional behaviors over GRPC.supervisor.
