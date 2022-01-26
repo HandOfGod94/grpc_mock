@@ -24,7 +24,7 @@ defmodule GrpcMock.Codegen.ProtoLoader do
   defp protoc(import_path, proto_files_glob) do
     System.cmd(
       "protoc",
-      ~w(--proto_path=#{import_path} --elixir_opt=package_prefix=GprcMock.Protos --elixir_out=plugins=grpc:#{proto_out_dir!()} #{proto_files_glob}),
+      ~w(--proto_path=#{import_path} --elixir_opt=package_prefix=GrpcMock.Protos --elixir_out=plugins=grpc:#{proto_out_dir!()} #{proto_files_glob}),
       stderr_to_stdout: true
     )
     |> case do

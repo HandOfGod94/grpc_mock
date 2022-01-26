@@ -9,7 +9,7 @@ defmodule GrpcMock.Factory do
   def mock_response_factory do
     %MockResponse{
       method: "say_hello",
-      return_type: "GprcMock.Protos.Helloworld.HelloReply",
+      return_type: "GrpcMock.Protos.Helloworld.HelloReply",
       data: Jason.encode!(%{message: "helloworld"})
     }
   end
@@ -17,7 +17,7 @@ defmodule GrpcMock.Factory do
   def server_factory do
     %Server{
       id: "starwars-server",
-      service: "GprcMock.Protos.Helloworld.Greeter.Service",
+      service: "GrpcMock.Protos.Helloworld.Greeter.Service",
       port: 3001,
       mock_responses: [build(:mock_response)]
     }
