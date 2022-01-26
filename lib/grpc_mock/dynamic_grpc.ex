@@ -1,4 +1,5 @@
 defmodule GrpcMock.DynamicGrpc do
+  alias Horde.Registry
   alias GrpcMock.DynamicGrpc.Server
   alias GrpcMock.DynamicGrpc.DynamicSupervisor
   alias GrpcMock.PbDynamicCompiler.CodeLoad
@@ -73,13 +74,11 @@ defmodule GrpcMock.DynamicGrpc do
     try do
       mocks = set_method_body!(server.mock_responses)
 
-      {content, _} =
-        :code.priv_dir(@otp_app)
-        |> Path.join("dynamic_server.eex")
-        |> EEx.compile_file()
-        |> Code.eval_quoted(app: app_name(server.service), service: server.service, mocks: mocks)
-
-      content
+      :code.priv_dir(@otp_app)
+      |> Path.join("dynamic_server.eex")
+      |> EEx.compile_file()
+      |> Code.eval_quoted(app: app_name(server.service), service: server.service, mocks: mocks)
+      |> then(fn {content, _bindings} -> content end)
       |> Code.compile_string()
       |> tap(
         &Enum.each(&1, fn {module_name, module_code} ->

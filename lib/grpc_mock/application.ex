@@ -24,7 +24,7 @@ defmodule GrpcMock.Application do
       GrpcMockWeb.Endpoint,
       # Start a worker by calling: GrpcMock.Worker.start_link(arg)
       {Task.Supervisor, name: GrpcMock.TaskSupervisor},
-      {Registry, keys: :unique, name: GrpcMock.ServerRegistry},
+      {Horde.Registry, keys: :unique, members: :auto, name: GrpcMock.ServerRegistry},
       {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor},
       GrpcMock.MnesiaSyncTask
     ]

@@ -14,7 +14,7 @@
   </li>
   <li>
     <strong>Alive?:</strong>
-    <%= Process.alive?(@pid) %>
+    <%= Swarm.whereis_name(@dynamic_server.id) != :undefined %>
   </li>
 
   <h3>Mocks</h3>

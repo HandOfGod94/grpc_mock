@@ -1,12 +1,13 @@
 defmodule GrpcMock.DynamicGrpc.GrpcGenServer do
   use GenServer, restart: :transient
   alias GrpcMock.DynamicGrpc.Server
+  alias Horde.Registry
 
   @moduledoc """
   Very dumb genserver to add additional behaviors over GRPC.supervisor.
 
   It adds:
-  1. named registration, so we can retrive pid and the server info on UI
+  1. named registration, so we can retrieve pid and the server info on UI
   2. make restart :transient, so in case if supervisor crashes it starts again, but if it stops, the server
   will die as well.
   """
