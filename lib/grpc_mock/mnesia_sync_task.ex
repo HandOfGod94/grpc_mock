@@ -1,6 +1,9 @@
 defmodule GrpcMock.MnesiaSyncTask do
   use Task, restart: :transient
 
+  ## TODO: this taks is hack. Better implementation should wait for reachable nodes
+  ## to be discoverable via `libcluster` and then Mnesia should join cluster.
+
   @moduledoc """
   In a cluster setup, esp. with orchestration engine like Kubernetes
   we will not have predictable Node names, and hence the Mnesia needs

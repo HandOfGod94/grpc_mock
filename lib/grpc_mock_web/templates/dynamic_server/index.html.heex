@@ -18,7 +18,7 @@
       <td><%= inspect(pid) %></td>
       <td><%= dynamic_server.service %></td>
       <td><%= dynamic_server.port %></td>
-      <td><%= Process.alive?(pid) %></td>
+      <td><%= Swarm.whereis_name(dynamic_server.id) != :undefined %></td>
 
       <td>
         <span><%= link "Show", to: Routes.dynamic_server_path(@conn, :show, dynamic_server) %></span>
