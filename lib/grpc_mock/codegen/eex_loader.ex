@@ -6,19 +6,17 @@ defmodule GrpcMock.Codegen.EExLoader do
   alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
   alias GrpcMock.Extension.Code, as: ExtCode
 
-  @otp_app :grpc_mock
-
   def load_modules(template, bindings) do
-    :code.priv_dir(@otp_app)
-    |> Path.join(template)
+    template
     |> EEx.compile_file()
     |> Code.eval_quoted(bindings)
     |> then(fn {content, _bindings} -> content end)
-    |> tap(&publish/1)
+    |> Code.compile_string()
+    |> tap(&remote_load/1)
     |> tap(&save_to_db/1)
   end
 
-  defp publish(modules) do
+  defp remote_load(modules) do
     Enum.each(modules, fn {module_name, module_code} ->
       ExtCode.remote_load(module_name, module_code)
     end)

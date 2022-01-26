@@ -3,8 +3,13 @@ defmodule GrpcMock.Codegen.ProtoLoader do
 
   import GrpcMock.Codegen.Modules.Store
 
+  alias Phoenix.PubSub
   alias GrpcMock.Extension.Code, as: ExtCode
+  alias GrpcMock.PbDynamicCompiler.CompileStatus
   alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
+
+  @pubsub GrpcMock.PubSub
+  @compile_status_topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
 
   defmodule CodeLoadError do
     defexception [:reason]
@@ -13,12 +18,12 @@ defmodule GrpcMock.Codegen.ProtoLoader do
   end
 
   def load_modules(import_path, proto_file) do
-    with :ok <- protoc(import_path, proto_file),
-         {:ok, compiled} <- do_load_modules(),
-         :ok <- publish(compiled),
-         {:atomic, _} <- save_to_db(compiled) do
-      Logger.info("successfully saved compiled code to DB")
-    end
+    protoc(import_path, proto_file)
+    |> then(fn :ok -> do_load_modules() end)
+    |> then(fn {:ok, compiled} -> compiled end)
+    |> tap(&remote_load/1)
+    |> tap(&publish/1)
+    |> tap(&save_to_db!/1)
   end
 
   defp protoc(import_path, proto_files_glob) do
@@ -50,15 +55,19 @@ defmodule GrpcMock.Codegen.ProtoLoader do
     end
   end
 
-  defp publish(modules) do
+  defp remote_load(modules) do
     Enum.each(modules, fn {module_name, module_code} ->
       ExtCode.remote_load(module_name, module_code)
     end)
 
-    Logger.info("Published to all nodes")
+    Logger.info("loaded binary on all nodes")
   end
 
-  defp save_to_db(modules) do
+  def publish(_modules) do
+    PubSub.broadcast!(@pubsub, @compile_status_topic, %CompileStatus{status: :finished})
+  end
+
+  defp save_to_db!(modules) do
     modules
     |> Enum.map(fn {module_name, module_code} ->
       dyn_module(
@@ -69,6 +78,10 @@ defmodule GrpcMock.Codegen.ProtoLoader do
       )
     end)
     |> ModuleRepo.save_all()
+    |> case do
+      {:atomic, result} -> result
+      {:aborted, reason} -> raise RuntimeError, message: inspect(reason)
+    end
   end
 
   defp proto_out_dir!, do: Application.fetch_env!(:grpc_mock, :proto_out_dir)

@@ -4,8 +4,8 @@
   <thead>
     <tr>
       <th>#</th>
-      <th>PID</th>
       <th>Service</th>
+      <th>Host</th>
       <th>Port</th>
       <th>Alive?</th>
       <th></th>
@@ -15,10 +15,10 @@
 <%= for {%{pid: pid, server: dynamic_server}, idx} <- Enum.with_index(@dynamic_servers, 1) do %>
     <tr>
       <td><%= idx %></td>
-      <td><%= inspect(pid) %></td>
       <td><%= dynamic_server.service %></td>
+      <td><%= inspect(node(pid)) %></td>
       <td><%= dynamic_server.port %></td>
-      <td><%= Swarm.whereis_name(dynamic_server.id) != :undefined %></td>
+      <td><%= Process.alive?(pid) %></td>
 
       <td>
         <span><%= link "Show", to: Routes.dynamic_server_path(@conn, :show, dynamic_server) %></span>

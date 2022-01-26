@@ -1,5 +1,6 @@
 defmodule GrpcMock.MnesiaSyncTask do
   use Task, restart: :transient
+  alias GrpcMock.Codegen.DbLoader
 
   ## TODO: this taks is hack. Better implementation should wait for reachable nodes
   ## to be discoverable via `libcluster` and then Mnesia should join cluster.
@@ -20,10 +21,13 @@ defmodule GrpcMock.MnesiaSyncTask do
 
   @spec run(any()) :: :ok | {:error, term()} | nil
   def run(_args) do
+    join_cluster()
+    DbLoader.load_modules()
+  end
+
+  defp join_cluster do
     if Node.list() != [] do
-      Node.list()
-      |> Enum.at(0)
-      |> Mnesiac.join_cluster()
+      Node.list() |> Mnesiac.init_mnesia()
     end
   end
 end

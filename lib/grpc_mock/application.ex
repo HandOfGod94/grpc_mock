@@ -23,11 +23,11 @@ defmodule GrpcMock.Application do
       # Start the Endpoint (http/https)
       GrpcMockWeb.Endpoint,
       # Start a worker by calling: GrpcMock.Worker.start_link(arg)
+      pg_spec(),
       {Task.Supervisor, name: GrpcMock.TaskSupervisor},
-      {Horde.Registry, keys: :unique, members: :auto, name: GrpcMock.ServerRegistry},
+      {Registry, keys: :unique, members: :auto, name: GrpcMock.ServerRegistry},
       {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor},
-      GrpcMock.MnesiaSyncTask,
-      {GrpcMock.CodegenServer, {:codegen, :load_from_db}}
+      GrpcMock.MnesiaSyncTask
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -42,5 +42,12 @@ defmodule GrpcMock.Application do
   def config_change(changed, _new, removed) do
     GrpcMockWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp pg_spec do
+    %{
+      id: :pg,
+      start: {:pg, :start_link, []}
+    }
   end
 end
