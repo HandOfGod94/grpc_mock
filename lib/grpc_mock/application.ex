@@ -26,7 +26,8 @@ defmodule GrpcMock.Application do
       {Task.Supervisor, name: GrpcMock.TaskSupervisor},
       {Horde.Registry, keys: :unique, members: :auto, name: GrpcMock.ServerRegistry},
       {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor},
-      GrpcMock.MnesiaSyncTask
+      GrpcMock.MnesiaSyncTask,
+      {GrpcMock.CodegenServer, {:codegen, :load_from_db}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

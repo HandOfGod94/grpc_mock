@@ -18,10 +18,12 @@ defmodule GrpcMock.MnesiaSyncTask do
     Task.start_link(__MODULE__, :run, [arg])
   end
 
-  @spec run(any()) :: :ok | {:error, term()}
+  @spec run(any()) :: :ok | {:error, term()} | nil
   def run(_args) do
-    Node.list()
-    |> Enum.at(0)
-    |> Mnesiac.join_cluster()
+    if Node.list() != [] do
+      Node.list()
+      |> Enum.at(0)
+      |> Mnesiac.join_cluster()
+    end
   end
 end
