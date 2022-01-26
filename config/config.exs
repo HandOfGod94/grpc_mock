@@ -49,10 +49,10 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 config :grpc, start_server: true
 
-# Mensia datastore config
+# Mnesia datastore config
 config :mnesiac,
   dir: './mnesia/#{node()}',
-  stores: [GrpcMock.PbDynamicCompiler.ModuleStore],
+  stores: [GrpcMock.Codegen.Modules.Store],
   schema_type: :ram_copies
 
 # Import environment specific config. This must remain at the bottom
