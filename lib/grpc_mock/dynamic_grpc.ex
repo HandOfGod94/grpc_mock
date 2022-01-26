@@ -3,6 +3,7 @@ defmodule GrpcMock.DynamicGrpc do
   alias GrpcMock.DynamicGrpc.Server
   alias GrpcMock.DynamicGrpc.DynamicSupervisor
   alias GrpcMock.PbDynamicCompiler.CodeLoad
+  alias GrpcMock.CodegenServer
 
   require Logger
 
@@ -74,16 +75,10 @@ defmodule GrpcMock.DynamicGrpc do
     try do
       mocks = set_method_body!(server.mock_responses)
 
-      :code.priv_dir(@otp_app)
-      |> Path.join("dynamic_server.eex")
-      |> EEx.compile_file()
-      |> Code.eval_quoted(app: app_name(server.service), service: server.service, mocks: mocks)
-      |> then(fn {content, _bindings} -> content end)
-      |> Code.compile_string()
-      |> tap(
-        &Enum.each(&1, fn {module_name, module_code} ->
-          CodeLoad.remote_load(module_name, module_code)
-        end)
+      CodegenServer.codegen(
+        {:eex,
+         template: "dynamic_server.eex",
+         bindings: [app: app_name(server.service), service: server.service, mocks: mocks]}
       )
     rescue
       error -> {:error, %MockgenError{reason: error}}

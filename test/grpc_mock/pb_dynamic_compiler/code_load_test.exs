@@ -25,10 +25,10 @@ defmodule GrpcMock.PbDynamicCompiler.CodeLoadTest do
       assert result == :ok
 
       assert modules == [
-               GprcMock.Protos.Helloworld.HelloReply,
-               GprcMock.Protos.Helloworld.Greeter.Service,
-               GprcMock.Protos.Helloworld.Greeter.Stub,
-               GprcMock.Protos.Helloworld.HelloRequest
+               GrpcMock.Protos.Helloworld.HelloReply,
+               GrpcMock.Protos.Helloworld.Greeter.Service,
+               GrpcMock.Protos.Helloworld.Greeter.Stub,
+               GrpcMock.Protos.Helloworld.HelloRequest
              ]
     end
 
