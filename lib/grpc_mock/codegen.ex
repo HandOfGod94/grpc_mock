@@ -25,26 +25,27 @@ defmodule GrpcMock.Codegen do
   import GrpcMock.Codegen.Modules.Store
   import GrpcMock.Codegen.Instruction
 
-  defstruct callback_mod: nil, fields: %{}, modules_generated: [], status: :todo, instructions: []
+  alias GrpcMock.Codegen.Instruction
+
+  defstruct parent_mod: nil, fields: %{}, modules_generated: [], status: :todo, instructions: []
 
   @type args :: any()
-  @type instruction :: {:compile, args()} | {:publish, args()} | {:save, args()}
   @type dynamic_module :: {module(), binary(), filename :: charlist()}
   @type status :: :todo | :in_progress | :done
 
   @type t :: %__MODULE__{
-          callback_mod: module(),
+          parent_mod: module(),
           fields: [atom()],
           modules_generated: [dynamic_module()],
-          instructions: [instruction()],
+          instructions: [Instruction.instruction()],
           status: status()
         }
 
   def cast(struct) do
-    callback_mod = struct.__struct__
+    parent_mod = struct.__struct__
 
     %__MODULE__{
-      callback_mod: callback_mod,
+      parent_mod: parent_mod,
       fields: Map.from_struct(struct)
     }
   end
@@ -97,7 +98,7 @@ defmodule GrpcMock.Codegen do
       |> Map.put(:instructions, [])
       |> Map.put(:status, :done)
 
-    {struct!(codegen.callback_mod, codegen.fields), codegen.modules_generated}
+    {struct!(codegen.parent_mod, codegen.fields), codegen.modules_generated}
   end
 
   defp do_apply(state, instruction) do
