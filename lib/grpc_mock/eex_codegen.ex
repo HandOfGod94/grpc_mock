@@ -1,6 +1,6 @@
-defmodule GrpcMock.Codegen.EExCodeGen do
+defmodule GrpcMock.EExCodeGen do
+  use GrpcMock.Codegen
   require Logger
-  import GrpcMock.Codegen
   alias GrpcMock.Codegen
   alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
 
