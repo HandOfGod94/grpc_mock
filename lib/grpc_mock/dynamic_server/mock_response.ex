@@ -1,4 +1,4 @@
-defmodule GrpcMock.DynamicGrpc.MockResponse do
+defmodule GrpcMock.DynamicServer.MockResponse do
   use Ecto.Schema
   import Ecto.Changeset
 

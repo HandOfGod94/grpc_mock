@@ -1,7 +1,7 @@
-defmodule GrpcMock.DynamicGrpc do
+defmodule GrpcMock.DynamicServer do
   alias Registry
-  alias GrpcMock.DynamicGrpc.Server
-  alias GrpcMock.DynamicGrpc.DynamicSupervisor
+  alias GrpcMock.DynamicServer.Server
+  alias GrpcMock.DynamicSupervisor
   alias GrpcMock.Codegen.EExLoader
 
   require Logger

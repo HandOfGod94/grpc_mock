@@ -1,6 +1,6 @@
-defmodule GrpcMock.DynamicGrpc.GrpcGenServer do
+defmodule GrpcMock.DynamicServer.GrpcGenServer do
   use GenServer, restart: :transient
-  alias GrpcMock.DynamicGrpc.Server
+  alias GrpcMock.DynamicServer.Server
   alias Registry
 
   @moduledoc """

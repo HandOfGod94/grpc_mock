@@ -1,7 +1,7 @@
-defmodule GrpcMock.DynamicGrpc.DynamicSupervisor do
+defmodule GrpcMock.DynamicSupervisor do
   use DynamicSupervisor
-  alias GrpcMock.DynamicGrpc.Server
-  alias GrpcMock.DynamicGrpc.GrpcGenServer
+  alias GrpcMock.DynamicServer.Server
+  alias GrpcMock.DynamicServer.GrpcGenServer
 
   @spec start_link(any()) :: Supervisor.on_start()
   def start_link(init_arg) do

@@ -1,6 +1,6 @@
-alias GrpcMock.DynamicGrpc.Server
-alias GrpcMock.DynamicGrpc.ServerRegistry
-alias GrpcMock.DynamicGrpc.Mock
+alias GrpcMock.DynamicServer.Server
+alias GrpcMock.DynamicServer.ServerRegistry
+alias GrpcMock.DynamicServer.Mock
 alias GrpcMock.PbDynamicCompiler
-alias GrpcMock.DynamicGrpc.MockResponse
+alias GrpcMock.DynamicServer.MockResponse
 alias GrpcMock.Codegen

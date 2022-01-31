@@ -26,7 +26,7 @@ defmodule GrpcMock.Application do
       pg_spec(),
       {Task.Supervisor, name: GrpcMock.TaskSupervisor},
       {Registry, keys: :unique, members: :auto, name: GrpcMock.ServerRegistry},
-      {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor},
+      {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicSupervisor},
       GrpcMock.Tasks.MnesiaSyncTask
     ]
 

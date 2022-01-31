@@ -1,15 +1,15 @@
-defmodule GrpcMock.DynamicGrpcTest do
+defmodule GrpcMock.DynamicServerTest do
   use ExUnit.Case, async: false
-  doctest GrpcMock.DynamicGrpc
+  doctest GrpcMock.DynamicServer
 
-  alias GrpcMock.DynamicGrpc
-  alias GrpcMock.DynamicGrpc.Server
+  alias GrpcMock.DynamicServer
+  alias GrpcMock.DynamicServer.Server
 
   @registry GrpcMock.ServerRegistry
 
   describe "list_all_servers/0" do
     test "returns empty list when there are no entries" do
-      res = DynamicGrpc.list_all_servers()
+      res = DynamicServer.list_all_servers()
       assert res == []
     end
 
@@ -31,14 +31,14 @@ defmodule GrpcMock.DynamicGrpcTest do
       name = {:via, Registry, {@registry, id, server}}
       {:ok, pid} = Agent.start_link(fn -> %{} end, name: name)
 
-      res = DynamicGrpc.list_all_servers()
+      res = DynamicServer.list_all_servers()
       assert [%{pid: ^pid, server: ^server}] = res
     end
   end
 
   describe "fetch_server/1" do
     test "should return nil when id is not present" do
-      res = DynamicGrpc.fetch_server("foo")
+      res = DynamicServer.fetch_server("foo")
       assert res == nil
     end
 
@@ -60,7 +60,7 @@ defmodule GrpcMock.DynamicGrpcTest do
       name = {:via, Registry, {@registry, server.id, server}}
       {:ok, pid} = Agent.start_link(fn -> %{} end, name: name)
 
-      assert {^pid, %Server{id: ^id}} = DynamicGrpc.fetch_server(id)
+      assert {^pid, %Server{id: ^id}} = DynamicServer.fetch_server(id)
     end
   end
 end

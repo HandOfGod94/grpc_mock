@@ -1,7 +1,7 @@
-defmodule GrpcMock.DynamicGrpc.MockResponseTest do
+defmodule GrpcMock.DynamicServer.MockResponseTest do
   use ExUnit.Case, async: true
-  doctest GrpcMock.DynamicGrpc.MockResponse
-  alias GrpcMock.DynamicGrpc.MockResponse
+  doctest GrpcMock.DynamicServer.MockResponse
+  alias GrpcMock.DynamicServer.MockResponse
 
   describe "changeset/2" do
     test "is invalid with empty mock_response" do
