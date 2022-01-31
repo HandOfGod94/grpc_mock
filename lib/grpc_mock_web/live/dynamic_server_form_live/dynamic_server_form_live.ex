@@ -14,7 +14,7 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
   def mount(_params, _session, socket) do
     empty_changeset =
       %Server{}
-      |> DynamicServer.change_dynamic_server()
+      |> Server.changeset()
       |> Ecto.Changeset.put_embed(:mock_responses, [%MockResponse{}])
 
     {:ok, assign(socket, %{changeset: empty_changeset, errors: ""})}

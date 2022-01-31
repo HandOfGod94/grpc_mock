@@ -2,7 +2,7 @@ defmodule GrpcMock.DynamicServer do
   alias Registry
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicSupervisor
-  alias GrpcMock.Codegen.EExLoader
+  alias GrpcMock.DynamicCompiler.EExCodeGen
 
   require Logger
 
@@ -46,7 +46,7 @@ defmodule GrpcMock.DynamicServer do
 
   @spec start_server(Server.t()) :: {:ok, Server.t()} | {:error, any()}
   def start_server(%Server{} = server) do
-    with [_, {endpoint, _}] <- generate_implmentation(server),
+    with [_, {endpoint, _, _}] <- generate_implmentation(server),
          :ok <- start_grpc_server(server, endpoint, Node.list()) do
       {:ok, server}
     else
@@ -93,18 +93,14 @@ defmodule GrpcMock.DynamicServer do
     end)
   end
 
-  @spec change_dynamic_server(Server.t(), map()) :: Ecto.Changeset.t()
-  def change_dynamic_server(server, params \\ %{}) do
-    Server.changeset(server, params)
-  end
-
   defp generate_implmentation(%Server{} = server) do
     try do
       mocks = set_method_body!(server.mock_responses)
-      tempate = :code.priv_dir(@otp_app) |> Path.join("dynamic_server.eex")
+      template = :code.priv_dir(@otp_app) |> Path.join("dynamic_server.eex")
       bindings = [app: app_name(server.service), service: server.service, mocks: mocks]
 
-      EExLoader.load_modules(tempate, bindings)
+      {_, modules} = EExCodeGen.compile(template, bindings)
+      modules
     rescue
       error -> {:error, %MockgenError{reason: error}}
     end
