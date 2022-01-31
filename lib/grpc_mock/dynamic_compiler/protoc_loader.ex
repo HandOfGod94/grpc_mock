@@ -34,9 +34,8 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoader do
     import_path = get_field(codegen, :import_path)
     file = get_field(codegen, :file)
 
-    protoc(import_path, file)
-    |> then(fn :ok -> do_load_modules() end)
-    |> then(fn {:ok, compiled} -> compiled end)
+    with :ok <- protoc(import_path, file),
+         do: do_load_modules()
   end
 
   defp protoc(import_path, proto_files_glob) do

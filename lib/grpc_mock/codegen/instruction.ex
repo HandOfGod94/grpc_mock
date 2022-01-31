@@ -1,6 +1,7 @@
 defmodule GrpcMock.Codegen.Instruction do
   alias GrpcMock.Extension.Code
   alias GrpcMock.Codegen
+  alias Phoenix.PubSub
 
   @type compiled_modules :: {module(), binary()}
   @type modules_fn :: (Codegen.t() -> [compiled_modules()])
@@ -20,8 +21,15 @@ defmodule GrpcMock.Codegen.Instruction do
 
   @spec decode_instruction(Codegen.t(), instruction()) :: {Codegen.t(), mfa_tuple()}
   def decode_instruction(codegen, {:compile, modules_fn: modules_fn}) do
-    modules = modules_fn.(codegen)
-    codegen = codegen |> set_generated_modules(modules)
+    codegen =
+      case modules_fn.(codegen) do
+        {:ok, modules} ->
+          codegen |> set_generated_modules(modules)
+
+        {:error, error} ->
+          codegen |> Codegen.add_error({:compile, error})
+      end
+
     {codegen, {Function, :identity, [codegen]}}
   end
 

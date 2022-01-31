@@ -27,7 +27,16 @@ defmodule GrpcMock.Codegen do
 
   alias GrpcMock.Codegen.Instruction
 
-  defstruct parent_mod: nil, fields: %{}, modules_generated: [], status: :todo, instructions: []
+  @compile_status_topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
+
+  defstruct parent_mod: nil,
+            fields: %{},
+            modules_generated: [],
+            status: :todo,
+            instructions: [],
+            failure_topic: @compile_status_topic,
+            valid?: true,
+            errors: []
 
   @type args :: any()
   @type dynamic_module :: {module(), binary(), filename :: charlist()}
@@ -38,7 +47,10 @@ defmodule GrpcMock.Codegen do
           fields: [atom()],
           modules_generated: [dynamic_module()],
           instructions: [Instruction.instruction()],
-          status: status()
+          status: status(),
+          failure_topic: String.t(),
+          valid?: boolean(),
+          errors: [any()]
         }
 
   def cast(struct) do
@@ -87,6 +99,10 @@ defmodule GrpcMock.Codegen do
 
   def take_instructions(%__MODULE__{} = codegen), do: Enum.reverse(codegen.instructions)
 
+  def add_error(%__MODULE__{} = codegen, error) do
+    %{codegen | valid?: false, errors: [error | codegen.errors]}
+  end
+
   ## instructions applier
 
   @spec apply_instruction(t()) :: {any(), [dynamic_module()]}
@@ -101,13 +117,17 @@ defmodule GrpcMock.Codegen do
     {struct!(codegen.parent_mod, codegen.fields), codegen.modules_generated}
   end
 
-  defp do_apply(state, instruction) do
+  defp do_apply(%__MODULE__{} = state, instruction) do
     Logger.info("applying instruction: #{inspect(instruction)}")
 
     {state, {mod, fun, args}} = decode_instruction(state, instruction)
-    apply(mod, fun, args)
+    if state.valid?, do: apply(mod, fun, args), else: publish_failure(state)
 
     Logger.info("successfully applied")
     state
+  end
+
+  defp publish_failure(%__MODULE__{} = codegen) do
+    Phoenix.PubSub.broadcast!(GrpcMock.PubSub, codegen.failure_topic, %{status: :failed, reason: codegen.errors})
   end
 end
