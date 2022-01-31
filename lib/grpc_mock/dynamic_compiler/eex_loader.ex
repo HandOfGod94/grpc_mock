@@ -1,4 +1,4 @@
-defmodule GrpcMock.DynamicCompiler.EExCodeGen do
+defmodule GrpcMock.DynamicCompiler.EExLoader do
   use GrpcMock.Codegen
   require Logger
   alias GrpcMock.Codegen.Instruction
@@ -7,8 +7,8 @@ defmodule GrpcMock.DynamicCompiler.EExCodeGen do
   @type t :: %__MODULE__{template: String.t(), bindings: keyword(atom())}
   defstruct [:template, :bindings]
 
-  @spec compile(String.t(), keyword(atom())) :: {t(), [Instruction.dynamic_module()]}
-  def compile(template, bindings) do
+  @spec load_modules(String.t(), keyword(atom())) :: {t(), [Instruction.dynamic_module()]}
+  def load_modules(template, bindings) do
     %__MODULE__{template: template, bindings: bindings}
     |> cast()
     |> set_compile_instructions()
