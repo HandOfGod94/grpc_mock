@@ -1,4 +1,6 @@
-defmodule GrpcMock.Codegen.ProtocCodegen do
+defmodule GrpcMock.ProtocCodegen do
+  use GrpcMock.Codegen
+
   require Logger
   import GrpcMock.Codegen
   alias GrpcMock.Codegen

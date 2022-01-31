@@ -27,7 +27,7 @@ defmodule GrpcMock.Application do
       {Task.Supervisor, name: GrpcMock.TaskSupervisor},
       {Registry, keys: :unique, members: :auto, name: GrpcMock.ServerRegistry},
       {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicGrpc.DynamicSupervisor},
-      GrpcMock.MnesiaSyncTask
+      GrpcMock.Tasks.MnesiaSyncTask
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

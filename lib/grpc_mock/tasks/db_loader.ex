@@ -1,4 +1,4 @@
-defmodule GrpcMock.Codegen.DbLoader do
+defmodule GrpcMock.Tasks.DbLoader do
   require Logger
 
   import GrpcMock.Codegen.Modules.Store
