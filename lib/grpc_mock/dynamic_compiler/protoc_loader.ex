@@ -1,9 +1,7 @@
 defmodule GrpcMock.DynamicCompiler.ProtocLoader do
-  use GrpcMock.Codegen
-
   require Logger
   import GrpcMock.Codegen
-  alias GrpcMock.Codegen.Instruction
+  alias GrpcMock.Codegen
   alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
 
   @type t :: %__MODULE__{import_path: String.t(), file: String.t()}
@@ -15,7 +13,7 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoader do
     def message(%{reason: reason}), do: "failed to generate code. reason: #{inspect(reason)}"
   end
 
-  @spec load_modules(String.t(), String.t()) :: {t(), [Instruction.dynamic_module()]}
+  @spec load_modules(String.t(), String.t()) :: {t(), [Codegen.dynamic_module()]}
   def load_modules(import_path, file) do
     %__MODULE__{import_path: import_path, file: file}
     |> cast()
