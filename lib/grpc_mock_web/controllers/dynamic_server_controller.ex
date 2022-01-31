@@ -1,17 +1,17 @@
 defmodule GrpcMockWeb.DynamicServerController do
   use GrpcMockWeb, :controller
 
-  alias GrpcMock.DynamicGrpc
+  alias GrpcMock.DynamicServer
 
   @spec index(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def index(conn, _params) do
-    dynamic_servers = DynamicGrpc.list_all_servers()
+    dynamic_servers = DynamicServer.list_all_servers()
     render(conn, "index.html", dynamic_servers: dynamic_servers)
   end
 
   @spec show(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def show(conn, %{"id" => id}) do
-    case DynamicGrpc.fetch_server(id) do
+    case DynamicServer.fetch_server(id) do
       {pid, server} ->
         render(conn, "show.html", pid: pid, dynamic_server: server)
 
@@ -24,7 +24,7 @@ defmodule GrpcMockWeb.DynamicServerController do
 
   @spec delete(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def delete(conn, %{"id" => id}) do
-    case DynamicGrpc.stop_server(id) do
+    case DynamicServer.stop_server(id) do
       {:ok, _dynamic_server} ->
         conn
         |> put_flash(:info, "Dynamic server stopped successfully.")

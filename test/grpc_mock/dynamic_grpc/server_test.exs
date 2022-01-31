@@ -1,7 +1,7 @@
-defmodule GrpcMock.DynamicGrpc.ServerTest do
+defmodule GrpcMock.DynamicServer.ServerTest do
   use ExUnit.Case, async: true
-  doctest GrpcMock.DynamicGrpc.Server
-  alias GrpcMock.DynamicGrpc.Server
+  doctest GrpcMock.DynamicServer.Server
+  alias GrpcMock.DynamicServer.Server
 
   describe "changeset/2" do
     test "is invalid - when required params are missing" do

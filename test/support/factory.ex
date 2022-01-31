@@ -3,8 +3,8 @@ defmodule GrpcMock.Factory do
 
   use ExMachina.Ecto
 
-  alias GrpcMock.DynamicGrpc.MockResponse
-  alias GrpcMock.DynamicGrpc.Server
+  alias GrpcMock.DynamicServer.MockResponse
+  alias GrpcMock.DynamicServer.Server
 
   def mock_response_factory do
     %MockResponse{

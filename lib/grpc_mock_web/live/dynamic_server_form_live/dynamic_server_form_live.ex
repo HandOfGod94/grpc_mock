@@ -1,9 +1,9 @@
 defmodule GrpcMockWeb.DynamicServerFormLive do
   use GrpcMockWeb, :live_view
 
-  alias GrpcMock.DynamicGrpc
-  alias GrpcMock.DynamicGrpc.Server
-  alias GrpcMock.DynamicGrpc.MockResponse
+  alias GrpcMock.DynamicServer
+  alias GrpcMock.DynamicServer.Server
+  alias GrpcMock.DynamicServer.MockResponse
 
   @impl Phoenix.LiveView
   def render(assigns) do
@@ -14,7 +14,7 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
   def mount(_params, _session, socket) do
     empty_changeset =
       %Server{}
-      |> DynamicGrpc.change_dynamic_server()
+      |> DynamicServer.change_dynamic_server()
       |> Ecto.Changeset.put_embed(:mock_responses, [%MockResponse{}])
 
     {:ok, assign(socket, %{changeset: empty_changeset, errors: ""})}
@@ -33,7 +33,7 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
   @impl Phoenix.LiveView
   def handle_event("save", %{"server" => params}, socket) do
     with {:ok, server} <- Server.new(params),
-         {:ok, server} <- DynamicGrpc.start_server(server) do
+         {:ok, server} <- DynamicServer.start_server(server) do
       {:noreply,
        socket
        |> put_flash(:info, "Dynamic server created successfully.")

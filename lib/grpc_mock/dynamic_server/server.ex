@@ -1,7 +1,7 @@
-defmodule GrpcMock.DynamicGrpc.Server do
+defmodule GrpcMock.DynamicServer.Server do
   use Ecto.Schema
   import Ecto.Changeset
-  alias GrpcMock.DynamicGrpc.MockResponse
+  alias GrpcMock.DynamicServer.MockResponse
 
   @required [:service, :port]
   @optional [:id]

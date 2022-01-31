@@ -1,7 +1,7 @@
 defmodule GrpcMockWeb.DynamicServerControllerTest do
   use GrpcMockWeb.ConnCase
   import GrpcMock.Factory
-  alias GrpcMock.DynamicGrpc
+  alias GrpcMock.DynamicServer
   alias GrpcMock.PbDynamicCompiler
 
   @registry GrpcMock.ServerRegistry
@@ -39,7 +39,7 @@ defmodule GrpcMockWeb.DynamicServerControllerTest do
 
     test "stop and delete chosen dynamic_server", %{conn: conn} do
       server = build(:server, id: "start-wars-#{Nanoid.generate()}")
-      {:ok, _} = DynamicGrpc.start_server(server)
+      {:ok, _} = DynamicServer.start_server(server)
 
       conn = delete(conn, Routes.dynamic_server_path(conn, :delete, server))
       assert redirected_to(conn) == Routes.dynamic_server_path(conn, :index)
