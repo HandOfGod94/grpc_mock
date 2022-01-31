@@ -1,4 +1,4 @@
-defmodule GrpcMock.ProtocCodegen do
+defmodule GrpcMock.DynamicCompiler.ProtocCodegen do
   use GrpcMock.Codegen
 
   require Logger

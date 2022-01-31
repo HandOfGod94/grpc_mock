@@ -1,4 +1,4 @@
-defmodule GrpcMock.EExCodeGen do
+defmodule GrpcMock.DynamicCompiler.EExCodeGen do
   use GrpcMock.Codegen
   require Logger
   alias GrpcMock.Codegen

@@ -1,8 +1,7 @@
 defmodule GrpcMockWeb.ProtocModuleLive.Index do
   use GrpcMockWeb, :live_view
 
-  alias GrpcMock.PbDynamicCompiler
-  alias GrpcMock.PbDynamicCompiler.CompileStatus
+  alias GrpcMock.DynamicCompiler
   alias Phoenix.PubSub
 
   @pubsub GrpcMock.PubSub
@@ -17,7 +16,7 @@ defmodule GrpcMockWeb.ProtocModuleLive.Index do
   @impl Phoenix.LiveView
   def handle_event("save", %{"protoc_compiler" => params}, socket) do
     %{"import_path" => import_path, "proto_file_glob" => proto_file_glob} = params
-    PbDynamicCompiler.codegen(import_path, proto_file_glob)
+    DynamicCompiler.load_for_proto(import_path, proto_file_glob)
 
     {:noreply,
      socket
@@ -26,7 +25,7 @@ defmodule GrpcMockWeb.ProtocModuleLive.Index do
   end
 
   @impl Phoenix.LiveView
-  def handle_info(%CompileStatus{} = message, socket) do
+  def handle_info(message, socket) do
     case message do
       %{status: :failed} ->
         socket = put_flash(socket, :error, format_compile_status(message))
@@ -38,17 +37,15 @@ defmodule GrpcMockWeb.ProtocModuleLive.Index do
     end
   end
 
-  defp list_protoc_modules do
-    PbDynamicCompiler.available_modules()
-  end
+  defp list_protoc_modules, do: DynamicCompiler.available_modules()
 
-  defp format_compile_status(%CompileStatus{} = status) do
+  defp format_compile_status(status) do
     case status do
-      %{status: :finished} ->
+      %{status: :done} ->
         "Successfully compiled and loaded all the modules"
 
-      %{status: :failed, error: error} ->
-        "Failed to load protoc module. error: #{Exception.message(error)}"
+      %{status: :failed} ->
+        "Failed to load protoc module"
     end
   end
 end
