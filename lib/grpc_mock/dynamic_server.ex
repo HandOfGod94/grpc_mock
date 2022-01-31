@@ -2,7 +2,7 @@ defmodule GrpcMock.DynamicServer do
   alias Registry
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicSupervisor
-  alias GrpcMock.DynamicCompiler.EExCodeGen
+  alias GrpcMock.DynamicCompiler.EExLoader
 
   require Logger
 
@@ -99,7 +99,7 @@ defmodule GrpcMock.DynamicServer do
       template = :code.priv_dir(@otp_app) |> Path.join("dynamic_server.eex")
       bindings = [app: app_name(server.service), service: server.service, mocks: mocks]
 
-      {_, modules} = EExCodeGen.compile(template, bindings)
+      {_, modules} = EExLoader.load_modules(template, bindings)
       modules
     rescue
       error -> {:error, %MockgenError{reason: error}}
