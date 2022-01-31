@@ -28,10 +28,17 @@ defmodule GrpcMock.DynamicCompiler.EExLoader do
     template = get_field(codegen, :template)
     bindings = get_field(codegen, :bindings)
 
-    template
-    |> EEx.compile_file()
-    |> Code.eval_quoted(bindings)
-    |> then(fn {content, _bindings} -> content end)
-    |> Code.compile_string()
+    try do
+      modules =
+        template
+        |> EEx.compile_file()
+        |> Code.eval_quoted(bindings)
+        |> then(fn {content, _bindings} -> content end)
+        |> Code.compile_string()
+
+      {:ok, modules}
+    catch
+      error -> {:error, error}
+    end
   end
 end

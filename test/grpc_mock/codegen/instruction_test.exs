@@ -23,7 +23,7 @@ defmodule GrpcMock.Codegen.InstructionTest do
     test "publish code - returns mfa for loading code to all node" do
       codegen = %Codegen{}
       data_fn = fn _ -> ["foo", "bar"] end
-      nodes = [:"foo@machine"]
+      nodes = [:foo@machine]
       {_, mfa} = decode_instruction(codegen, {:publish, {:code, nodes: nodes, data_fn: data_fn}})
       assert mfa == {GrpcMock.Extension.Code, :remote_load, [["foo", "bar"], [:foo@machine]]}
     end
