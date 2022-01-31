@@ -4,7 +4,6 @@ defmodule GrpcMock.Codegen.DbLoader do
   import GrpcMock.Codegen.Modules.Store
 
   alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
-  alias GrpcMock.Extension.Code
 
   @table :dyn_module
 
@@ -19,7 +18,6 @@ defmodule GrpcMock.Codegen.DbLoader do
         {dyn_module(record, :name), dyn_module(record, :filename), dyn_module(record, :code_binary)}
 
       :code.load_binary(name, filename, code_binary)
-      Code.remote_load(name, filename, code_binary)
     end
 
     Logger.info("successfully loaded modules from mnesia")

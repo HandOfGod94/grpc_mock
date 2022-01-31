@@ -1,5 +1,11 @@
-defmodule GrpcMock.Codegen.ProtocCompiler do
+defmodule GrpcMock.Codegen.ProtocCodegen do
   require Logger
+  import GrpcMock.Codegen
+  alias GrpcMock.Codegen
+  alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
+
+  @type t :: %__MODULE__{import_path: String.t(), file: String.t()}
+  defstruct [:import_path, :file]
 
   defmodule CodeLoadError do
     defexception [:reason]
@@ -7,7 +13,27 @@ defmodule GrpcMock.Codegen.ProtocCompiler do
     def message(%{reason: reason}), do: "failed to generate code. reason: #{inspect(reason)}"
   end
 
+  @spec compile(String.t(), String.t()) :: {t(), [Codegen.dynamic_module()]}
   def compile(import_path, file) do
+    %__MODULE__{import_path: import_path, file: file}
+    |> cast()
+    |> set_compile_instructions()
+    |> apply_instruction()
+  end
+
+  @topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
+  defp set_compile_instructions(codegen) do
+    codegen
+    |> generate_modules_with(&protobuf/1)
+    |> save_with(ModuleRepo)
+    |> broadcast_status(@topic, %{status: :done})
+    |> load_modules_on(nodes: Node.list())
+  end
+
+  defp protobuf(codegen) do
+    import_path = get_field(codegen, :import_path)
+    file = get_field(codegen, :file)
+
     protoc(import_path, file)
     |> then(fn :ok -> do_load_modules() end)
     |> then(fn {:ok, compiled} -> compiled end)

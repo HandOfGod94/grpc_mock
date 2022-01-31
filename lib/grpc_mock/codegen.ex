@@ -26,51 +26,40 @@ defmodule GrpcMock.Codegen do
   require Logger
 
   import GrpcMock.Codegen.Modules.Store
-  alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
-  alias GrpcMock.Codegen.ProtocCompiler
-  alias GrpcMock.Codegen.EExCompiler
   alias GrpcMock.Extension.Code
   alias Phoenix.PubSub
 
-  defstruct modules_generated: [], status: :todo, instructions: []
+  defstruct callback_mod: nil, fields: %{}, modules_generated: [], status: :todo, instructions: []
 
   @type args :: any()
   @type instruction :: {:compile, args()} | {:publish, args()} | {:save, args()}
   @type dynamic_module :: {module(), binary(), filename :: charlist()}
   @type status :: :todo | :in_progress | :done
 
-  @opaque t :: %__MODULE__{
+  @type t :: %__MODULE__{
+            callback_mod: module(),
+            fields: [atom()],
             modules_generated: [dynamic_module()],
             instructions: [instruction()],
             status: status()
           }
 
-  @spec modules_generated(t()) :: [dynamic_module()]
-  def modules_generated(%__MODULE__{modules_generated: modules}), do: modules
-
-  @spec eex_compile(t(), String.t(), keyword()) :: t()
-  def eex_compile(%__MODULE__{} = codegen, template, bindings) do
-    compile = {:compile, {:eex, template: template, bindings: bindings}}
-    compile = put_instruction(codegen, compile)
-
-    compile
-    |> save()
-    |> broadcast_status()
-    |> load_modules_on_all_nodes()
+  def cast(struct) do
+    callback_mod = struct.__struct__
+    %__MODULE__{
+      callback_mod: callback_mod,
+      fields: Map.from_struct(struct)
+    }
   end
 
-  @spec protoc_compile(t(), String.t(), String.t()) :: t()
-  def protoc_compile(%__MODULE__{} = codegen, import_path, file) do
-    compile = {:compile, {:protoc, import_path: import_path, file: file}}
-    compile = put_instruction(codegen, compile)
+  def get_field(%__MODULE__{} = codegen, field), do: codegen.fields[field]
 
-    compile
-    |> save()
-    |> broadcast_status()
-    |> load_modules_on_all_nodes()
+  def generate_modules_with(%__MODULE__{} = codegen, modules_fn) do
+    compile = {:compile, modules_fn: modules_fn}
+    codegen |> put_instruction(compile)
   end
 
-  defp save(%__MODULE__{} = codegen) do
+  def save_with(%__MODULE__{} = codegen, repo) do
     data_fn = fn codegen ->
       codegen.modules_generated
       |> Enum.map(fn {mod, filename, bin} ->
@@ -78,21 +67,17 @@ defmodule GrpcMock.Codegen do
       end)
     end
 
-    instruction = {:save, {:modules_generated, repo: ModuleRepo, data_fn: data_fn}}
+    instruction = {:save, {:modules_generated, repo: repo, data_fn: data_fn}}
 
     codegen |> put_instruction(instruction)
   end
 
-  @topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
-  defp broadcast_status(%__MODULE__{} = codegen) do
-    status_message = fn codegen -> %{status: codegen.status} end
-    instruction = {:publish, {:pubsub, topic: @topic, data_fn: status_message}}
+  def broadcast_status(%__MODULE__{} = codegen, topic, message) do
+    instruction = {:publish, {:pubsub, topic: topic, message: message}}
     codegen |> put_instruction(instruction)
   end
 
-  defp load_modules_on_all_nodes(%__MODULE__{} = codegen), do: load_modules_on_nodes(codegen, Node.list())
-
-  defp load_modules_on_nodes(%__MODULE__{} = codegen, nodes) do
+  def load_modules_on(%__MODULE__{} = codegen, nodes: nodes) do
     data_fn = fn codegen -> codegen.modules_generated end
     instruction = {:publish, {:code, nodes: nodes, data_fn: data_fn}}
     codegen |> put_instruction(instruction)
@@ -106,13 +91,16 @@ defmodule GrpcMock.Codegen do
 
   ## instructions applier
 
-  @spec apply_instruction(t()) :: t()
+  @spec apply_instruction(t()) :: {any(), [dynamic_module()]}
   def apply_instruction(%__MODULE__{} = codegen) do
-    codegen
-    |> take_instructions()
-    |> Enum.reduce(codegen, &do_apply(&2, &1))
-    |> Map.put(:instructions, [])
-    |> Map.put(:status, :done)
+    codegen =
+      codegen
+      |> take_instructions()
+      |> Enum.reduce(codegen, &do_apply(&2, &1))
+      |> Map.put(:instructions, [])
+      |> Map.put(:status, :done)
+
+    {struct!(codegen.callback_mod, codegen.fields), codegen.modules_generated}
   end
 
   defp do_apply(state, instruction) do
@@ -124,32 +112,26 @@ defmodule GrpcMock.Codegen do
     state
   end
 
-  defp decode_instruction(codegen, {:compile, {:eex, args}}) do
-    modules = EExCompiler.compile(args[:template], args[:bindings])
-    codegen = codegen |> set_generated_modules(modules)
-    {codegen, {Function, :identity, [codegen]}}
-  end
-
-  defp decode_instruction(codegen, {:compile, {:protoc, args}}) do
-    modules = ProtocCompiler.compile(args[:import_path], args[:file])
+  defp decode_instruction(codegen, {:compile, modules_fn: module_fn}) do
+    modules = module_fn.(codegen)
     codegen = codegen |> set_generated_modules(modules)
     {codegen, {Function, :identity, [codegen]}}
   end
 
   defp decode_instruction(codegen, {:save, {:modules_generated, args}}) do
-    records = apply(args[:data_fn], [codegen])
+    records = args[:data_fn].(codegen)
     {codegen, {args[:repo], :save_all, [records]}}
   end
 
   defp decode_instruction(codegen, {:publish, {:code, args}}) do
-    data = apply(args[:data_fn], [codegen])
+    data = args[:data_fn].(codegen)
     {codegen, {Code, :remote_load, [data, args[:nodes]]}}
   end
 
   @pubsub GrpcMock.PubSub
   defp decode_instruction(codegen, {:publish, {:pubsub, args}}) do
     topic = args[:topic]
-    message = apply(args[:data_fn], [codegen])
+    message = args[:message]
     {codegen, {PubSub, :broadcast!, [@pubsub, topic, message]}}
   end
 
