@@ -123,13 +123,18 @@ defmodule GrpcMock.DynamicCompiler.Codegen do
     {struct!(codegen.parent_mod, codegen.fields), codegen.modules_generated}
   end
 
-  defp do_apply(%__MODULE__{} = state, instruction) do
+  defp do_apply(%__MODULE__{valid?: true} = state, instruction) do
     Logger.info("applying codegen instruction: #{inspect(instruction)}")
 
     {state, {mod, fun, args}} = decode_instruction(state, instruction)
     if state.valid?, do: apply(mod, fun, args), else: publish_failure(state)
 
     Logger.info("applied codegen instruction")
+    state
+  end
+
+  defp do_apply(state, instruction) do
+    Logger.warning("skipping codegen #{inspect(instruction)} because of error in previous step")
     state
   end
 

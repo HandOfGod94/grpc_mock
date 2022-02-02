@@ -93,7 +93,7 @@ defmodule GrpcMock.DynamicServer.Servergen do
   end
 
   defp do_apply(state, instruction) do
-    Logger.warning("skipping #{inspect(instruction)} because of error in previous step")
+    Logger.warning("skipping servergen #{inspect(instruction)} because of error in previous step")
     state
   end
 end
