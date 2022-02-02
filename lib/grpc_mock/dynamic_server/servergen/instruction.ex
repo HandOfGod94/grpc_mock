@@ -1,5 +1,5 @@
-defmodule GrpcMock.Servergen.Instruction do
-  alias GrpcMock.Servergen
+defmodule GrpcMock.DynamicServer.Servergen.Instruction do
+  alias GrpcMock.DynamicServer.Servergen
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicServer.ImplmentationGenerator
 

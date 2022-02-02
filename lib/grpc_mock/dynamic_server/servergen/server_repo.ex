@@ -1,4 +1,4 @@
-defmodule GrpcMock.Servergen.ServerRepo do
+defmodule GrpcMock.DynamicServer.Servergen.ServerRepo do
   @table :grpc_server
 
   def all_dirty do

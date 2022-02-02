@@ -2,7 +2,7 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
   use GrpcMockWeb, :live_view
 
   alias GrpcMock.DynamicServer
-  alias GrpcMock.Servergen
+  alias GrpcMock.DynamicServer.Servergen
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicServer.MockResponse
 

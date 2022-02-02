@@ -1,4 +1,4 @@
-defmodule GrpcMock.Servergen do
+defmodule GrpcMock.DynamicServer.Servergen do
   @moduledoc """
   Provides data driven api for creating dynamic servers
 
@@ -16,9 +16,9 @@ defmodule GrpcMock.Servergen do
   """
 
   require Logger
-  import GrpcMock.Servergen.Instruction
-  import GrpcMock.Servergen.ServerStore
-  alias GrpcMock.Servergen.Instruction
+  import GrpcMock.DynamicServer.Servergen.Instruction
+  import GrpcMock.DynamicServer.Servergen.ServerStore
+  alias GrpcMock.DynamicServer.Servergen.Instruction
   alias GrpcMock.DynamicServer.Server
 
   defstruct server: %Server{}, endpoint: nil, valid?: true, errors: [], instructions: []

@@ -1,4 +1,4 @@
-defmodule GrpcMock.Servergen.ServerStore do
+defmodule GrpcMock.DynamicServer.Servergen.ServerStore do
   use Mnesiac.Store
   import Record, only: [defrecord: 3]
 

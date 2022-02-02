@@ -1,11 +1,11 @@
 defmodule GrpcMock.DynamicServer do
-  import GrpcMock.Servergen
+  import GrpcMock.DynamicServer.Servergen
 
   alias Registry
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicSupervisor
-  alias GrpcMock.Servergen
-  alias GrpcMock.Servergen.ServerRepo
+  alias GrpcMock.DynamicServer.Servergen
+  alias GrpcMock.DynamicServer.Servergen.ServerRepo
 
   require Logger
 
