@@ -2,6 +2,7 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
   use GrpcMockWeb, :live_view
 
   alias GrpcMock.DynamicServer
+  alias GrpcMock.Servergen
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicServer.MockResponse
 
@@ -32,8 +33,7 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
 
   @impl Phoenix.LiveView
   def handle_event("save", %{"server" => params}, socket) do
-    with {:ok, server} <- Server.new(params),
-         {:ok, server} <- DynamicServer.start_server(server) do
+    with {:ok, server} <- DynamicServer.start_server(Servergen.new(), params) do
       {:noreply,
        socket
        |> put_flash(:info, "Dynamic server created successfully.")

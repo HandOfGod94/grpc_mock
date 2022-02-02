@@ -11,10 +11,10 @@ defmodule GrpcMock.Codegen do
        {helloworld.Greeter, <<foobar>>, 'helloworld.gen.ex'}
      ]
      instructions: [
-       {:compile, modules_fn: fn -> protoc_decdoer() end}
+       {:compile, generator_fn: fn -> protoc_decdoer() end}
        {:publish, {:code, nodes: [:"foo@machine", :"bar@machine"]}, data_fn: &derive/1}
        {:publish, {:pubsub, topic: "sometopic", message: %{status: "success"}}}
-       {:save {:modules_generated, repo: ModuleRepo, data_fn: &dervive/1}}
+       {:save {:modules_generated, repo: ModuleRepo, records_fn: &dervive/1}}
      ],
      status: :todo
    }
@@ -66,22 +66,22 @@ defmodule GrpcMock.Codegen do
   @spec get_field(t(), atom()) :: any()
   def get_field(%__MODULE__{} = codegen, field), do: codegen.fields[field]
 
-  @spec generate_modules_with(t(), Instruction.modules_fn()) :: t()
-  def generate_modules_with(%__MODULE__{} = codegen, modules_fn) do
-    compile = {:compile, modules_fn: modules_fn}
+  @spec generate_modules_with(t(), Instruction.generator_fn()) :: t()
+  def generate_modules_with(%__MODULE__{} = codegen, generator_fn) do
+    compile = {:compile, generator_fn: generator_fn}
     codegen |> put_instruction(compile)
   end
 
   @spec save_with(t(), module()) :: t()
   def save_with(%__MODULE__{} = codegen, repo) do
-    data_fn = fn codegen ->
+    records_fn = fn codegen ->
       codegen.modules_generated
       |> Enum.map(fn {mod, filename, bin} ->
         dyn_module(id: mod, name: mod, filename: filename, code_binary: bin)
       end)
     end
 
-    instruction = {:save, {:modules_generated, repo: repo, data_fn: data_fn}}
+    instruction = {:save, {:modules_generated, repo: repo, records_fn: records_fn}}
 
     codegen |> put_instruction(instruction)
   end
@@ -94,8 +94,7 @@ defmodule GrpcMock.Codegen do
 
   @spec load_modules_on(t(), nodes: [node()]) :: t()
   def load_modules_on(%__MODULE__{} = codegen, nodes: nodes) do
-    data_fn = fn codegen -> codegen.modules_generated end
-    instruction = {:publish, {:code, nodes: nodes, data_fn: data_fn}}
+    instruction = {:publish, {:code, nodes: nodes}}
     codegen |> put_instruction(instruction)
   end
 
@@ -125,12 +124,12 @@ defmodule GrpcMock.Codegen do
   end
 
   defp do_apply(%__MODULE__{} = state, instruction) do
-    Logger.info("applying instruction: #{inspect(instruction)}")
+    Logger.info("applying codegen instruction: #{inspect(instruction)}")
 
     {state, {mod, fun, args}} = decode_instruction(state, instruction)
     if state.valid?, do: apply(mod, fun, args), else: publish_failure(state)
 
-    Logger.info("successfully applied")
+    Logger.info("applied codegen instruction")
     state
   end
 

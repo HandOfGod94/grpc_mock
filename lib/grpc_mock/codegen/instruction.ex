@@ -1,17 +1,18 @@
 defmodule GrpcMock.Codegen.Instruction do
   alias GrpcMock.Extension.Code
+  alias GrpcMock.Codegen.Modules.Store
   alias GrpcMock.Codegen
   alias Phoenix.PubSub
 
   @type compiled_modules :: {module(), binary()}
-  @type modules_fn :: (Codegen.t() -> [compiled_modules()])
-  @type data_fn :: (Codegen.t() -> [any()])
+  @type generator_fn :: (Codegen.t() -> [compiled_modules()])
+  @type records_fn :: (Codegen.t() -> [Store.dyn_module()])
 
-  @type compile_instruction :: {:compile, modules_fn: modules_fn()}
-  @type save_instruction :: {:save, {:modules_generated, repo: atom(), data_fn: data_fn()}}
+  @type compile_instruction :: {:compile, generator_fn: generator_fn()}
+  @type save_instruction :: {:save, {:modules_generated, repo: atom(), records_fn: records_fn()}}
   @type publish_instruction ::
           {:publish, {:pubsub, topic: String.t(), message: any()}}
-          | {:publish, {:code, nodes: list(atom()), data_fn: data_fn()}}
+          | {:publish, {:code, nodes: list(atom())}}
 
   @type instruction :: compile_instruction() | save_instruction() | publish_instruction()
 
@@ -20,27 +21,23 @@ defmodule GrpcMock.Codegen.Instruction do
   @type mfa_tuple :: {module(), function_name(), args()}
 
   @spec decode_instruction(Codegen.t(), instruction()) :: {Codegen.t(), mfa_tuple()}
-  def decode_instruction(codegen, {:compile, modules_fn: modules_fn}) do
+  def decode_instruction(codegen, {:compile, generator_fn: generator_fn}) do
     codegen =
-      case modules_fn.(codegen) do
-        {:ok, modules} ->
-          codegen |> set_generated_modules(modules)
-
-        {:error, error} ->
-          codegen |> Codegen.add_error({:compile, error})
+      case generator_fn.(codegen) do
+        {:ok, modules} -> set_generated_modules(codegen, modules)
+        {:error, error} -> Codegen.add_error(codegen, {:compile, error})
       end
 
     {codegen, {Function, :identity, [codegen]}}
   end
 
-  def decode_instruction(codegen, {:save, {:modules_generated, repo: repo, data_fn: data_fn}}) do
-    records = data_fn.(codegen)
+  def decode_instruction(codegen, {:save, {:modules_generated, repo: repo, records_fn: records_fn}}) do
+    records = records_fn.(codegen)
     {codegen, {repo, :save_all, [records]}}
   end
 
-  def decode_instruction(codegen, {:publish, {:code, nodes: nodes, data_fn: data_fn}}) do
-    data = data_fn.(codegen)
-    {codegen, {Code, :remote_load, [data, nodes]}}
+  def decode_instruction(codegen, {:publish, {:code, nodes: nodes}}) do
+    {codegen, {Code, :remote_load, [codegen.modules_generated, nodes]}}
   end
 
   @pubsub GrpcMock.PubSub

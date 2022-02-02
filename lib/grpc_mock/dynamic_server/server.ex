@@ -2,6 +2,7 @@ defmodule GrpcMock.DynamicServer.Server do
   use Ecto.Schema
   import Ecto.Changeset
   alias GrpcMock.DynamicServer.MockResponse
+  alias GrpcMock.DynamicSupervisor
 
   @required [:service, :port]
   @optional [:id]
@@ -41,5 +42,19 @@ defmodule GrpcMock.DynamicServer.Server do
     server
     |> changeset(params)
     |> apply_action(:update)
+  end
+
+  def start(server, endpoint, nodes) do
+    nodes
+    |> Enum.with_index()
+    |> Enum.each(fn {node, idx} ->
+      ## HACK: for now it's just incrementing port number, so in local it doesn't clash
+      server = %{server | port: server.port + idx}
+
+      Node.spawn(node, fn ->
+        {:ok, pid} = DynamicSupervisor.start_server(server, endpoint)
+        :pg.join(server.id, pid)
+      end)
+    end)
   end
 end

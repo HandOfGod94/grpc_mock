@@ -52,7 +52,7 @@ config :grpc, start_server: true
 # Mnesia datastore config
 config :mnesiac,
   dir: './mnesia/#{node()}',
-  stores: [GrpcMock.Codegen.Modules.Store],
+  stores: [GrpcMock.Codegen.Modules.Store, GrpcMock.Servergen.ServerStore],
   schema_type: :ram_copies
 
 # Import environment specific config. This must remain at the bottom
