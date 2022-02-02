@@ -7,6 +7,7 @@ defmodule GrpcMock.Extension.Code do
   Loads dynamically generated module to all the remote node
   """
 
+  @spec remote_load([module()], [node()]) :: list(rpc_call_result())
   def remote_load(modules, nodes) when is_list(modules) and is_list(nodes) do
     for {mod_name, filename, mod_code} <- modules do
       remote_load(mod_name, filename, mod_code, nodes)
@@ -30,6 +31,7 @@ defmodule GrpcMock.Extension.Code do
     end
   end
 
+  @spec dynamic_module_filename(module()) :: charlist()
   def dynamic_module_filename(module) do
     module
     |> Atom.to_string()

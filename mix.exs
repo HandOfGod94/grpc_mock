@@ -25,7 +25,8 @@ defmodule GrpcMock.MixProject do
       deps: deps(),
       dialyzer: [
         flags: [:race_conditions],
-        plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+        plt_add_deps: :app_tree
       ]
     ]
   end

@@ -43,8 +43,8 @@ defmodule GrpcMock.Codegen do
   @type status :: :todo | :in_progress | :done
 
   @type t :: %__MODULE__{
-          parent_mod: module(),
-          fields: [atom()],
+          parent_mod: module() | nil,
+          fields: [atom()] | %{},
           modules_generated: [dynamic_module()],
           instructions: [Instruction.instruction()],
           status: status(),
@@ -53,6 +53,7 @@ defmodule GrpcMock.Codegen do
           errors: [any()]
         }
 
+  @spec cast(struct()) :: t()
   def cast(struct) do
     parent_mod = struct.__struct__
 
@@ -62,13 +63,16 @@ defmodule GrpcMock.Codegen do
     }
   end
 
+  @spec get_field(t(), atom()) :: any()
   def get_field(%__MODULE__{} = codegen, field), do: codegen.fields[field]
 
+  @spec generate_modules_with(t(), Instruction.modules_fn()) :: t()
   def generate_modules_with(%__MODULE__{} = codegen, modules_fn) do
     compile = {:compile, modules_fn: modules_fn}
     codegen |> put_instruction(compile)
   end
 
+  @spec save_with(t(), module()) :: t()
   def save_with(%__MODULE__{} = codegen, repo) do
     data_fn = fn codegen ->
       codegen.modules_generated
@@ -82,30 +86,33 @@ defmodule GrpcMock.Codegen do
     codegen |> put_instruction(instruction)
   end
 
+  @spec broadcast_status(t(), String.t(), any()) :: t()
   def broadcast_status(%__MODULE__{} = codegen, topic, message) do
     instruction = {:publish, {:pubsub, topic: topic, message: message}}
     codegen |> put_instruction(instruction)
   end
 
+  @spec load_modules_on(t(), nodes: [node()]) :: t()
   def load_modules_on(%__MODULE__{} = codegen, nodes: nodes) do
     data_fn = fn codegen -> codegen.modules_generated end
     instruction = {:publish, {:code, nodes: nodes, data_fn: data_fn}}
     codegen |> put_instruction(instruction)
   end
 
-  defp put_instruction(%__MODULE__{} = codegen, instruction) do
-    %{codegen | instructions: [instruction | codegen.instructions]}
-  end
-
-  def take_instructions(%__MODULE__{} = codegen), do: Enum.reverse(codegen.instructions)
-
+  @spec add_error(t(), any()) :: t()
   def add_error(%__MODULE__{} = codegen, error) do
     %{codegen | valid?: false, errors: [error | codegen.errors]}
   end
 
+  defp put_instruction(%__MODULE__{} = codegen, instruction) do
+    %{codegen | instructions: [instruction | codegen.instructions]}
+  end
+
+  defp take_instructions(%__MODULE__{} = codegen), do: Enum.reverse(codegen.instructions)
+
   ## instructions applier
 
-  @spec apply_instruction(t()) :: {any(), [dynamic_module()]}
+  @spec apply_instruction(t()) :: {struct(), [dynamic_module()]}
   def apply_instruction(%__MODULE__{} = codegen) do
     codegen =
       codegen

@@ -12,12 +12,6 @@ defmodule GrpcMock.DynamicServer do
     def message(%{reason: reason}), do: "failed to start server. reason: #{inspect(reason)}"
   end
 
-  defmodule MockgenError do
-    defexception [:reason]
-    @impl Exception
-    def message(%{reason: reason}), do: "failed to create mock. reason: #{inspect(reason)}"
-  end
-
   @registry GrpcMock.ServerRegistry
   @otp_app :grpc_mock
 
@@ -46,17 +40,18 @@ defmodule GrpcMock.DynamicServer do
 
   @spec start_server(Server.t()) :: {:ok, Server.t()} | {:error, any()}
   def start_server(%Server{} = server) do
-    with [_, {endpoint, _, _}] <- generate_implmentation(server),
+    with {:ok, modules} <- generate_implmentation(server),
+         [_service, {endpoint, _, _}] <- modules,
          :ok <- start_grpc_server(server, endpoint, Node.list()) do
       {:ok, server}
     else
-      {:error, %MockgenError{} = error} -> {:error, error}
       {:error, %Ecto.Changeset{} = errors} -> {:error, errors}
       {:error, error} -> {:error, %StartFailedError{reason: error}}
+      _ -> {:error, %StartFailedError{reason: :invalid_modules}}
     end
   end
 
-  def start_grpc_server(server, endpoint, nodes) do
+  defp start_grpc_server(server, endpoint, nodes) do
     nodes = [node() | nodes]
 
     nodes
@@ -84,8 +79,7 @@ defmodule GrpcMock.DynamicServer do
   defp stop_on_all_nodes(id) do
     nodes = [node() | Node.list()]
 
-    nodes
-    |> Enum.each(fn node ->
+    Enum.each(nodes, fn node ->
       Node.spawn(node, fn ->
         owner_node_pid = :pg.get_local_members(id) |> Enum.at(0)
         DynamicSupervisor.stop_server(owner_node_pid)
@@ -93,16 +87,12 @@ defmodule GrpcMock.DynamicServer do
     end)
   end
 
+  @template :code.priv_dir(@otp_app) |> Path.join("dynamic_server.eex")
   defp generate_implmentation(%Server{} = server) do
-    try do
-      mocks = set_method_body!(server.mock_responses)
-      template = :code.priv_dir(@otp_app) |> Path.join("dynamic_server.eex")
-      bindings = [app: app_name(server.service), service: server.service, mocks: mocks]
-
-      {_, modules} = EExLoader.load_modules(template, bindings)
-      modules
-    rescue
-      error -> {:error, %MockgenError{reason: error}}
+    with {:ok, mocks} <- set_method_body(server.mock_responses),
+         bindings <- [app: app_name(server.service), service: server.service, mocks: mocks],
+         {_, modules} when is_list(modules) <- EExLoader.load_modules(@template, bindings) do
+      {:ok, modules}
     end
   end
 
@@ -112,11 +102,17 @@ defmodule GrpcMock.DynamicServer do
     |> Enum.at(-2)
   end
 
-  defp set_method_body!(mock_responses) do
-    Enum.reduce(mock_responses, [], fn resp, acc ->
-      data = Jason.decode!(resp.data, keys: :atoms)
-      stub = {resp.method, resp.return_type, inspect(data)}
-      [stub | acc]
+  defp set_method_body(mock_responses) do
+    mock_responses
+    |> Enum.reduce_while([], fn resp, acc ->
+      case Jason.decode(resp.data, keys: :atoms) do
+        {:ok, decoded} -> {:cont, [{resp.method, resp.return_type, inspect(decoded)} | acc]}
+        {:error, error} -> {:halt, {:error, error}}
+      end
     end)
+    |> case do
+      {:error, error} -> {:error, error}
+      otherwise -> {:ok, otherwise}
+    end
   end
 end

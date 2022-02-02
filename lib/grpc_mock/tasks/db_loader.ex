@@ -7,6 +7,7 @@ defmodule GrpcMock.Tasks.DbLoader do
 
   @table :dyn_module
 
+  @spec load_modules() :: :ok
   def load_modules do
     Logger.info("loading modules from mnesia")
     :mnesia.wait_for_tables([@table], 10_000)

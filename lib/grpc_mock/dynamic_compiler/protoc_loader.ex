@@ -53,18 +53,14 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoader do
   defp do_load_modules do
     Logger.info("Loading proto generated modules")
 
-    try do
-      compiled =
-        "#{proto_out_dir!()}/**/*.ex"
-        |> Path.wildcard()
-        |> Enum.map(&Code.compile_file/1)
-        |> List.flatten()
+    compiled =
+      "#{proto_out_dir!()}/**/*.ex"
+      |> Path.wildcard()
+      |> Enum.map(&Code.compile_file/1)
+      |> List.flatten()
 
-      Logger.info("Proto generated modules are successfully loaded.")
-      {:ok, compiled}
-    catch
-      error -> {:error, %CodeLoadError{reason: error}}
-    end
+    Logger.info("Proto generated modules are successfully loaded.")
+    {:ok, compiled}
   end
 
   defp proto_out_dir!, do: Application.fetch_env!(:grpc_mock, :proto_out_dir)

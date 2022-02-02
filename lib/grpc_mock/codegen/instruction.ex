@@ -48,7 +48,7 @@ defmodule GrpcMock.Codegen.Instruction do
     {codegen, {PubSub, :broadcast!, [@pubsub, topic, message]}}
   end
 
-  def set_generated_modules(codegen, modules) do
+  defp set_generated_modules(codegen, modules) do
     modules_generated =
       modules
       |> Enum.map(fn {mod, bin} -> {mod, Code.dynamic_module_filename(mod), bin} end)
