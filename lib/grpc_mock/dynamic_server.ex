@@ -40,12 +40,13 @@ defmodule GrpcMock.DynamicServer do
     end
   end
 
+  @template :code.priv_dir(:grpc_mock) |> Path.join("dynamic_server.eex")
   def start_server(servergen, server_params) do
     servergen =
       servergen
       |> build_server_struct(server_params)
-      |> generate_implmentation()
-      |> start(nodes: [node() | Node.list()])
+      |> generate_implmentation(template: @template)
+      |> launch_on(nodes: [node() | Node.list()])
       |> save(ServerRepo)
       |> apply_instruction()
 

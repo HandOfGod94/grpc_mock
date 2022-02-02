@@ -2,12 +2,10 @@ defmodule GrpcMock.DynamicServer.ImplmentationGenerator do
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicCompiler.EExLoader
 
-  @template :code.priv_dir(:grpc_mock) |> Path.join("dynamic_server.eex")
-
-  def generate(%Server{} = server) do
+  def generate(%Server{} = server, template) do
     with {:ok, mocks} <- set_method_body(server.mock_responses),
          bindings <- [app: app_name(server.service), service: server.service, mocks: mocks],
-         {_, modules} when is_list(modules) <- EExLoader.load_modules(@template, bindings) do
+         {_, modules} when is_list(modules) <- EExLoader.load_modules(template, bindings) do
       {:ok, modules}
     end
   end

@@ -53,12 +53,12 @@ defmodule GrpcMock.DynamicServer.Servergen do
     servergen |> put_instruction({:build_server_struct, params: params})
   end
 
-  def generate_implmentation(servergen) do
-    servergen |> put_instruction({:generate_implmentation})
+  def generate_implmentation(servergen, template: template) do
+    servergen |> put_instruction({:generate_implmentation, template: template})
   end
 
-  def start(servergen, nodes: nodes) do
-    servergen |> put_instruction({:start, nodes: nodes})
+  def launch_on(servergen, nodes: nodes) do
+    servergen |> put_instruction({:launch_on, nodes: nodes})
   end
 
   def save(servergen, repo) do

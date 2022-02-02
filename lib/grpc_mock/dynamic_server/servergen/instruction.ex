@@ -13,9 +13,9 @@ defmodule GrpcMock.DynamicServer.Servergen.Instruction do
     {servergen, {Function, :identity, [servergen]}}
   end
 
-  def decode_instruction(servergen, {:generate_implmentation}) do
+  def decode_instruction(servergen, {:generate_implmentation, template: template}) do
     servergen =
-      with {:ok, modules} <- ImplmentationGenerator.generate(servergen.server),
+      with {:ok, modules} <- ImplmentationGenerator.generate(servergen.server, template),
            [_service, endpoint] <- modules,
            {endpoint_mod, _, _} <- endpoint do
         Servergen.set_endpoint(servergen, endpoint_mod)
@@ -26,8 +26,8 @@ defmodule GrpcMock.DynamicServer.Servergen.Instruction do
     {servergen, {Function, :identity, [servergen]}}
   end
 
-  def decode_instruction(servergen, {:start, nodes: nodes}) do
-    {servergen, {Server, :start, [servergen.server, servergen.endpoint, nodes]}}
+  def decode_instruction(servergen, {:launch_on, nodes: nodes}) do
+    {servergen, {Server, :launch_on, [servergen.server, servergen.endpoint, nodes]}}
   end
 
   def decode_instruction(servergen, {:save, repo: repo, records_fn: records_fn}) do
