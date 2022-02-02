@@ -1,8 +1,8 @@
-defmodule GrpcMock.Codegen.InstructionTest do
+defmodule GrpcMock.DynamicCompiler.Codegen.InstructionTest do
   use ExUnit.Case, async: true
-  alias GrpcMock.Codegen
-  doctest GrpcMock.Codegen.Instruction
-  import GrpcMock.Codegen.Instruction
+  alias GrpcMock.DynamicCompiler.Codegen
+  doctest GrpcMock.DynamicCompiler.Codegen.Instruction
+  import GrpcMock.DynamicCompiler.Codegen.Instruction
 
   describe "decode_instruction/2" do
     test "compile instruction - executes module function and modifies state" do

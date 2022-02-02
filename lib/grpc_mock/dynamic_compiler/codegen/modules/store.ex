@@ -1,4 +1,4 @@
-defmodule GrpcMock.Codegen.Modules.Store do
+defmodule GrpcMock.DynamicCompiler.Codegen.Modules.Store do
   @moduledoc """
   Mnesia store, to hold all the loaded modules available.
   """

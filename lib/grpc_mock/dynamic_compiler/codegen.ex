@@ -1,4 +1,4 @@
-defmodule GrpcMock.Codegen do
+defmodule GrpcMock.DynamicCompiler.Codegen do
   @moduledoc """
   Load multiple dynamically generated modules at runtime.
   It will hold all the required information for genrating dynamic code from `eex` or `proto`.any()
@@ -22,10 +22,10 @@ defmodule GrpcMock.Codegen do
 
   require Logger
 
-  import GrpcMock.Codegen.Modules.Store
-  import GrpcMock.Codegen.Instruction
+  import GrpcMock.DynamicCompiler.Codegen.Modules.Store
+  import GrpcMock.DynamicCompiler.Codegen.Instruction
 
-  alias GrpcMock.Codegen.Instruction
+  alias GrpcMock.DynamicCompiler.Codegen.Instruction
 
   @compile_status_topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
 

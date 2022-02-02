@@ -1,8 +1,8 @@
 defmodule GrpcMock.DynamicCompiler.EExLoader do
   require Logger
-  import GrpcMock.Codegen
-  alias GrpcMock.Codegen
-  alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
+  import GrpcMock.DynamicCompiler.Codegen
+  alias GrpcMock.DynamicCompiler.Codegen
+  alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
 
   @type t :: %__MODULE__{template: String.t(), bindings: keyword(atom())}
   defstruct [:template, :bindings]

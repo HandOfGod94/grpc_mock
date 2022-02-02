@@ -1,7 +1,7 @@
-defmodule GrpcMock.Codegen.Instruction do
+defmodule GrpcMock.DynamicCompiler.Codegen.Instruction do
   alias GrpcMock.Extension.Code
-  alias GrpcMock.Codegen.Modules.Store
-  alias GrpcMock.Codegen
+  alias GrpcMock.DynamicCompiler.Codegen.Modules.Store
+  alias GrpcMock.DynamicCompiler.Codegen
   alias Phoenix.PubSub
 
   @type compiled_modules :: {module(), binary()}

@@ -1,9 +1,9 @@
 defmodule GrpcMock.Tasks.DbLoader do
   require Logger
 
-  import GrpcMock.Codegen.Modules.Store
+  import GrpcMock.DynamicCompiler.Codegen.Modules.Store
 
-  alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
+  alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
 
   @table :dyn_module
 

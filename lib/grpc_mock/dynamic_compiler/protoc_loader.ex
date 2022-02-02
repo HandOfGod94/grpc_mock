@@ -1,8 +1,8 @@
 defmodule GrpcMock.DynamicCompiler.ProtocLoader do
   require Logger
-  import GrpcMock.Codegen
-  alias GrpcMock.Codegen
-  alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
+  import GrpcMock.DynamicCompiler.Codegen
+  alias GrpcMock.DynamicCompiler.Codegen
+  alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
 
   @type t :: %__MODULE__{import_path: String.t(), file: String.t()}
   defstruct [:import_path, :file]

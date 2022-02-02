@@ -1,7 +1,7 @@
 defmodule GrpcMock.DynamicCompiler do
   require Logger
   alias GrpcMock.DynamicCompiler.ProtocLoader
-  alias GrpcMock.Codegen.Modules.Repo, as: ModuleRepo
+  alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
 
   @task_supervisor GrpcMock.TaskSupervisor
 

@@ -1,7 +1,7 @@
-defmodule GrpcMock.CodegenTest do
+defmodule GrpcMock.DynamicCompiler.CodegenTest do
   use ExUnit.Case, async: true
-  doctest GrpcMock.Codegen
-  alias GrpcMock.Codegen
+  doctest GrpcMock.DynamicCompiler.Codegen
+  alias GrpcMock.DynamicCompiler.Codegen
 
   test "eex_compile/3 - sets eex compile instruction to codegen" do
     {instruction, _codegen} = %Codegen{} |> Codegen.eex_compile("foo.ex", foo: "bar", fizz: "buzz")
@@ -18,7 +18,11 @@ defmodule GrpcMock.CodegenTest do
     {instruction, _codegen} = %Codegen{modules_generated: dummy_mods} |> Codegen.save()
 
     assert instruction == [
-             [save: {GrpcMock.Codegen.Modules.Repo, :save_all, [[{:dyn_module, Foo, Foo, 'foo.gen.ex', "foo"}]]}]
+             [
+               save:
+                 {GrpcMock.DynamicCompiler.Codegen.Modules.Repo, :save_all,
+                  [[{:dyn_module, Foo, Foo, 'foo.gen.ex', "foo"}]]}
+             ]
            ]
   end
 end

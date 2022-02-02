@@ -1,5 +1,5 @@
-defmodule GrpcMock.Codegen.Modules.Repo do
-  alias GrpcMock.Codegen.Modules.Store
+defmodule GrpcMock.DynamicCompiler.Codegen.Modules.Repo do
+  alias GrpcMock.DynamicCompiler.Codegen.Modules.Store
 
   @table :dyn_module
 
