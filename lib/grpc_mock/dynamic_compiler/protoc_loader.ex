@@ -1,11 +1,10 @@
 defmodule GrpcMock.DynamicCompiler.ProtocLoader do
   require Logger
   import GrpcMock.DynamicCompiler.Codegen
-  alias GrpcMock.DynamicCompiler.Codegen
   alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
 
   @type t :: %__MODULE__{import_path: String.t(), file: String.t()}
-  defstruct [:import_path, :file]
+  defstruct [:import_path, :file, modules_generated: []]
 
   defmodule CodeLoadError do
     defexception [:reason]
@@ -13,7 +12,7 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoader do
     def message(%{reason: reason}), do: "failed to generate code. reason: #{inspect(reason)}"
   end
 
-  @spec load_modules(String.t(), String.t()) :: {t(), [Codegen.dynamic_module()]}
+  @spec load_modules(String.t(), String.t()) :: {:ok, t()} | {:error, any()}
   def load_modules(import_path, file) do
     %__MODULE__{import_path: import_path, file: file}
     |> cast()
@@ -53,14 +52,18 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoader do
   defp do_load_modules do
     Logger.info("Loading proto generated modules")
 
-    compiled =
-      "#{proto_out_dir!()}/**/*.ex"
-      |> Path.wildcard()
-      |> Enum.map(&Code.compile_file/1)
-      |> List.flatten()
+    try do
+      compiled =
+        "#{proto_out_dir!()}/**/*.ex"
+        |> Path.wildcard()
+        |> Enum.map(&Code.compile_file/1)
+        |> List.flatten()
 
-    Logger.info("Proto generated modules are successfully loaded.")
-    {:ok, compiled}
+      Logger.info("Proto generated modules are successfully loaded.")
+      {:ok, compiled}
+    rescue
+      error -> {:error, error}
+    end
   end
 
   defp proto_out_dir!, do: Application.fetch_env!(:grpc_mock, :proto_out_dir)

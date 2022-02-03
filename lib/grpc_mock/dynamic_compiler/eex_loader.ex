@@ -1,13 +1,12 @@
 defmodule GrpcMock.DynamicCompiler.EExLoader do
   require Logger
   import GrpcMock.DynamicCompiler.Codegen
-  alias GrpcMock.DynamicCompiler.Codegen
   alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
 
   @type t :: %__MODULE__{template: String.t(), bindings: keyword(atom())}
-  defstruct [:template, :bindings]
+  defstruct [:template, :bindings, modules_generated: []]
 
-  @spec load_modules(String.t(), keyword(atom())) :: {t(), [Codegen.dynamic_module()]}
+  @spec load_modules(String.t(), keyword(atom())) :: {:ok, t()} | {:error, any()}
   def load_modules(template, bindings) do
     %__MODULE__{template: template, bindings: bindings}
     |> cast()
@@ -28,11 +27,17 @@ defmodule GrpcMock.DynamicCompiler.EExLoader do
     template = get_field(codegen, :template)
     bindings = get_field(codegen, :bindings)
 
-    template
-    |> EEx.compile_file()
-    |> Code.eval_quoted(bindings)
-    |> then(fn {content, _bindings} -> content end)
-    |> Code.compile_string()
-    |> then(fn modules -> {:ok, modules} end)
+    try do
+      modules =
+        template
+        |> EEx.compile_file()
+        |> Code.eval_quoted(bindings)
+        |> then(fn {content, _bindings} -> content end)
+        |> Code.compile_string()
+
+      {:ok, modules}
+    rescue
+      error -> {:error, error}
+    end
   end
 end

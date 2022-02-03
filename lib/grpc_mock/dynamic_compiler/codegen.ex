@@ -111,7 +111,7 @@ defmodule GrpcMock.DynamicCompiler.Codegen do
 
   ## instructions applier
 
-  @spec apply_instruction(t()) :: {struct(), [dynamic_module()]}
+  @spec apply_instruction(t()) :: {:ok, struct()} | {:error, any()}
   def apply_instruction(%__MODULE__{} = codegen) do
     codegen =
       codegen
@@ -120,7 +120,13 @@ defmodule GrpcMock.DynamicCompiler.Codegen do
       |> Map.put(:instructions, [])
       |> Map.put(:status, :done)
 
-    {struct!(codegen.parent_mod, codegen.fields), codegen.modules_generated}
+    if codegen.valid? do
+      fields = %{codegen.fields | modules_generated: codegen.modules_generated}
+      codegen = %{codegen | fields: fields}
+      {:ok, struct!(codegen.parent_mod, codegen.fields)}
+    else
+      {:error, codegen.errors}
+    end
   end
 
   defp do_apply(%__MODULE__{valid?: true} = state, instruction) do
