@@ -1,7 +1,9 @@
 defmodule GrpcMock.DynamicServer.ImplmentationGenerator do
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicCompiler.EExLoader
+  alias GrpcMock.DynamicCompiler.Codegen
 
+  @spec generate(Server.t(), filename :: String.t()) :: {:ok, [Codegen.dynamic_module()]} | {:error, any()}
   def generate(%Server{service: service, mock_responses: mock_responses}, template)
       when service != nil and
              mock_responses != nil and

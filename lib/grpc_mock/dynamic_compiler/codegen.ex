@@ -67,7 +67,7 @@ defmodule GrpcMock.DynamicCompiler.Codegen do
   def get_field(%__MODULE__{} = codegen, field), do: codegen.fields[field]
 
   @spec generate_modules_with(t(), Instruction.generator_fn()) :: t()
-  def generate_modules_with(%__MODULE__{} = codegen, generator_fn) do
+  def generate_modules_with(%__MODULE__{} = codegen, generator_fn) when is_function(generator_fn, 1) do
     compile = {:compile, generator_fn: generator_fn}
     codegen |> put_instruction(compile)
   end

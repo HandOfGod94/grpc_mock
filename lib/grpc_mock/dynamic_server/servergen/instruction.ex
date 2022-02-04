@@ -15,7 +15,8 @@ defmodule GrpcMock.DynamicServer.Servergen.Instruction do
 
   def decode_instruction(servergen, {:generate_implmentation, template: template}) do
     servergen =
-      with {:ok, modules} <- ImplmentationGenerator.generate(servergen.server, template),
+      with %{server: server} when server != nil <- servergen,
+           {:ok, modules} <- ImplmentationGenerator.generate(server, template),
            [_service, endpoint] <- modules,
            {endpoint_mod, _, _} <- endpoint do
         Servergen.set_endpoint(servergen, endpoint_mod)

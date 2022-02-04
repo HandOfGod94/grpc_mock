@@ -2,7 +2,7 @@ defmodule GrpcMockWeb.DynamicServerControllerTest do
   use GrpcMockWeb.ConnCase
   import GrpcMock.Factory
   alias GrpcMock.DynamicServer
-  alias GrpcMock.PbDynamicCompiler
+  alias GrpcMock.DynamicCompiler.ProtocLoader
 
   @registry GrpcMock.ServerRegistry
 
@@ -35,7 +35,7 @@ defmodule GrpcMockWeb.DynamicServerControllerTest do
   end
 
   describe "stop dynamic_server" do
-    setup [:start_pb_dynamic_compiler, :create_dynamic_server]
+    setup [:load_modules, :create_dynamic_server]
 
     test "stop and delete chosen dynamic_server", %{conn: conn} do
       server = build(:server, id: "start-wars-#{Nanoid.generate()}")
@@ -47,14 +47,9 @@ defmodule GrpcMockWeb.DynamicServerControllerTest do
     end
   end
 
-  defp start_pb_dynamic_compiler(_) do
-    start_supervised(PbDynamicCompiler)
-
+  defp load_modules(_) do
     import_path = Path.join([File.cwd!(), "test", "support", "fixtures"])
-    PbDynamicCompiler.codegen(import_path, "helloworld.proto")
-    # wait till cast request completes
-    :sys.get_state(PbDynamicCompiler)
-
+    ProtocLoader.load_modules(import_path, "helloworld.proto")
     :ok
   end
 
