@@ -2,7 +2,6 @@ defmodule GrpcMock.DynamicCompiler.Codegen.ModulesStore do
   @moduledoc """
   Mnesia store, to hold all the loaded modules available.
   """
-  use Mnesiac.Store
   import Record, only: [defrecord: 3]
 
   @table :dyn_module
@@ -25,7 +24,6 @@ defmodule GrpcMock.DynamicCompiler.Codegen.ModulesStore do
             code_binary: binary()
           )
 
-  @impl Mnesiac.Store
   def store_options do
     [
       record_name: @table,

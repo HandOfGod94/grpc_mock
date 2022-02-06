@@ -1,21 +1,18 @@
 defmodule GrpcMock.Application do
   # credo:disable-for-this-file
 
+  alias GrpcMock.DynamicCompiler.Codegen.ModulesStore
+
   @moduledoc false
 
   use Application
 
   @impl Application
   def start(_type, _args) do
-    topologies = [
-      grpc_mock: [
-        strategy: Cluster.Strategy.LocalEpmd
-      ]
-    ]
+    # TODO: add wait for tables check
+    :mnesia.create_table(:dyn_module, ModulesStore.store_options())
 
     children = [
-      {Cluster.Supervisor, [topologies, [name: GrpcMock.ClusterSupervisor]]},
-      {Mnesiac.Supervisor, [[], [name: GrpcMock.MnesiacSupervisor]]},
       # Start the Telemetry supervisor
       GrpcMockWeb.Telemetry,
       # Start the PubSub system
