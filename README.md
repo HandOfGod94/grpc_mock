@@ -1,14 +1,18 @@
 # GrpcMock
 
-:warning::construction: POC  :construction::warning:  
-:warning::construction: Work In Progress  :construction::warning:
+|:warning::construction:|Caution|:construction::warning:|
+|---|---|---|
+|:warning::construction:|Work In Progress|:construction::warning:|
+
+---
 
 [![build](https://github.com/HandOfGod94/grpc_mock/actions/workflows/build.yml/badge.svg)](https://github.com/HandOfGod94/grpc_mock/actions/workflows/build.yml)
+[![coverage](https://coveralls.io/repos/github/HandOfGod94/grpc_mock/badge.svg?branch=main)](https://coveralls.io/github/HandOfGod94/grpc_mock?branch=main)
 
 ## Features
-- Dynamic Proto Compilation. No need to add dependencies on config file, directly compile it via UI
+- Dynamic Proto Compilation. Directly compile it via UI.
 - Generate mock server dynamically and access it via dynamically binded ports
-- partial mocking (only want to mock one or 2 methods out of protobuf contract not an issue, do it rightaway)
+- Supports partial mocking (only want to mock one or 2 methods out of protobuf contract not an issue, do it rightaway)
 
 ## Run using docker
 ```
