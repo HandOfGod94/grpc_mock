@@ -44,6 +44,6 @@ defmodule GrpcMock.DynamicServer.Server do
     |> apply_action(:update)
   end
 
-  @spec start(t(), module()) :: DynamicSupervisor.on_start_child()
+  @spec start(t(), module()) :: Supervisor.on_start_child()
   def start(server, endpoint), do: DynamicSupervisor.start_server(server, endpoint)
 end

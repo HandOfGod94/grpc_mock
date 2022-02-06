@@ -1,5 +1,5 @@
 defmodule GrpcMock.DynamicCompiler.EExLoaderTest do
-  use ExUnit.Case
+  use GrpcMock.MnesiaCase
   doctest GrpcMock.DynamicCompiler.EExLoader
 
   import GrpcMock.Factory
@@ -11,30 +11,22 @@ defmodule GrpcMock.DynamicCompiler.EExLoaderTest do
   @template :code.priv_dir(:grpc_mock) |> Path.join("dynamic_server.eex")
   @mnesia_table :dyn_module
 
-  setup do
-    :mnesia.create_table(@mnesia_table, ModulesStore.store_options())
-
-    on_exit(fn ->
-      :mnesia.transaction(fn -> :mnesia.clear_table(@mnesia_table) end)
-    end)
-
-    :ok
-  end
-
-  describe "load_modules/2" do
-    test "return codegen with error when template is absent" do
+  describe "load_modules/2 - error scenarios" do
+    test "returns error when template is absent" do
       assert {:error, errors} = EExLoader.load_modules("invalid_template.eex", foo: "bar")
       assert [compile: %File.Error{reason: :enoent}] = errors
     end
 
-    test "returns codegen with error when bindings are invalid" do
+    test "returns error when bindings are invalid" do
       assert {:error, errors} = EExLoader.load_modules(@template, app: "Foo", foo: :bar)
       assert [compile: %CompileError{}] = errors
     end
+  end
 
-    test "sets modules_generated when template and bindings are valid" do
-      load_test_proto_modules()
+  describe "load_modules/2 - when template and bindings are valid" do
+    setup :load_proto_modules
 
+    test "returns loader with modules_generated field set" do
       mocks = [{:say_hello, HelloReply, inspect(%{message: "hello world"})}]
       %{service: service} = build(:server)
       bindings = [app: "Greeter", service: service, mocks: mocks]
@@ -48,9 +40,11 @@ defmodule GrpcMock.DynamicCompiler.EExLoaderTest do
     end
   end
 
-  defp load_test_proto_modules do
+  defp load_proto_modules(_) do
     import_path = Path.join([File.cwd!(), "test", "support", "fixtures"])
     proto_file = "helloworld.proto"
     ProtocLoader.load_modules(import_path, proto_file)
+
+    :ok
   end
 end

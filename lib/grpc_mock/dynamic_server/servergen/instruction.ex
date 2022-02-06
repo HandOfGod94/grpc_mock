@@ -3,6 +3,8 @@ defmodule GrpcMock.DynamicServer.Servergen.Instruction do
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicServer.ImplmentationGenerator
 
+  @dialyzer {:no_match, decode_instruction: 2}
+
   @type instruction ::
           {:build_server_struct, params: map()}
           | {:generate_implmentation, template: String.t()}

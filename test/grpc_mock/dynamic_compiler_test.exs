@@ -1,14 +1,7 @@
 defmodule GrpcMock.DynamicCompilerTest do
-  use ExUnit.Case
+  use GrpcMock.MnesiaCase
   doctest GrpcMock.DynamicCompiler
   alias GrpcMock.DynamicCompiler
-  import GrpcMock.DynamicCompiler.Codegen.ModulesStore
-
-  setup do
-    :mnesia.create_table(:dyn_module, store_options())
-    :mnesia.wait_for_tables([:dyn_module], 10_000)
-    :ok
-  end
 
   describe "available_modules/0" do
     test "returns all the key present in module table" do

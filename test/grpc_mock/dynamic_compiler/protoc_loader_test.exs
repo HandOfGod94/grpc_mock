@@ -1,5 +1,5 @@
 defmodule GrpcMock.DynamicCompiler.ProtocLoaderTest do
-  use ExUnit.Case, async: true
+  use GrpcMock.MnesiaCase, async: true
   doctest GrpcMock.DynamicCompiler.ProtocLoader
   alias GrpcMock.DynamicCompiler.ProtocLoader
   alias GrpcMock.DynamicCompiler.Codegen.ModulesStore
@@ -8,12 +8,6 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoaderTest do
 
   setup do
     import_path = Path.join([File.cwd!(), "test", "support", "fixtures"])
-    :mnesia.create_table(@mnesia_table, ModulesStore.store_options())
-
-    on_exit(fn ->
-      :mnesia.transaction(fn -> :mnesia.clear_table(@mnesia_table) end)
-    end)
-
     %{import_path: import_path}
   end
 

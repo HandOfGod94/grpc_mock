@@ -27,7 +27,7 @@ defmodule GrpcMock.DynamicServer.Servergen do
           endpoint: module(),
           valid?: boolean(),
           errors: [any()],
-          instructions: [Instruction.instructions()]
+          instructions: [Instruction.instruction()]
         }
 
   @spec new() :: t()
