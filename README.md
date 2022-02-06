@@ -44,21 +44,3 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
-
-## Build via docker/Earthfile
-* [Earthly](https://earthly.dev/)
-* Docker
-
-```sh
-# install earthly
-make setup
-
-# build/compile
-make compile
-
-# builds docker image
-make build
-
-# run
-make run
-```
