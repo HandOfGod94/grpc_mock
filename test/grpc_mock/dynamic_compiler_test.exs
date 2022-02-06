@@ -2,6 +2,7 @@ defmodule GrpcMock.DynamicCompilerTest do
   use GrpcMock.MnesiaCase
   doctest GrpcMock.DynamicCompiler
   alias GrpcMock.DynamicCompiler
+  import GrpcMock.DynamicCompiler.Codegen.ModulesStore
 
   describe "available_modules/0" do
     test "returns all the key present in module table" do

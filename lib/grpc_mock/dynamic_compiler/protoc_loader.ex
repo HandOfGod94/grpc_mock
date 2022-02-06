@@ -12,20 +12,16 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoader do
     def message(%{reason: reason}), do: "failed to generate code. reason: #{inspect(reason)}"
   end
 
+  @topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
+
   @spec load_modules(String.t(), String.t()) :: {:ok, t()} | {:error, any()}
   def load_modules(import_path, file) do
     %__MODULE__{import_path: import_path, file: file}
     |> cast()
-    |> set_compile_instructions()
-    |> apply_instruction()
-  end
-
-  @topic Application.compile_env(:grpc_mock, :compile_status_updates_topic)
-  defp set_compile_instructions(codegen) do
-    codegen
     |> generate_modules_with(&protobuf/1)
     |> save_with(ModulesRepo)
     |> broadcast_status(@topic, %{status: :done})
+    |> apply_instruction()
   end
 
   defp protobuf(codegen) do
