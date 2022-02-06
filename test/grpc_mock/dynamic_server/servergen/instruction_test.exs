@@ -84,20 +84,11 @@ defmodule GrpcMock.DynamicServer.Servergen.InstructionTest do
       assert [{:generate_implmentation, _}] = state.errors
     end
 
-    test "launch_on - sets action to launch on list of nodes" do
+    test "launch - sets action to launch grpc server" do
       servergen = %Servergen{server: :foo, endpoint: :bar}
-      nodes = [:foo@machine, :bar@machine]
-      {_, action} = decode_instruction(servergen, {:launch_on, nodes: nodes})
+      {_, action} = decode_instruction(servergen, {:launch})
 
-      assert action == {Server, :start, [servergen.server, servergen.endpoint, nodes]}
-    end
-
-    test "save - sets action to save server details with a repo" do
-      servergen = Servergen.new()
-      records_fn = & &1.server
-      {_, action} = decode_instruction(servergen, {:save, repo: DummyRepo, records_fn: records_fn})
-
-      assert action == {DummyRepo, :save, [records_fn.(servergen)]}
+      assert action == {Server, :start, [servergen.server, servergen.endpoint]}
     end
   end
 

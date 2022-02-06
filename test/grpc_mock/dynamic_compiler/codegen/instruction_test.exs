@@ -21,13 +21,6 @@ defmodule GrpcMock.DynamicCompiler.Codegen.InstructionTest do
       assert mfa == {FooRepo, :save_all, [["foo", "bar"]]}
     end
 
-    test "publish code - returns mfa for loading code to all node" do
-      codegen = %Codegen{modules_generated: ["foo", "bar"]}
-      nodes = [:foo@machine]
-      {_, mfa} = decode_instruction(codegen, {:publish, {:code, nodes: nodes}})
-      assert mfa == {GrpcMock.Extension.Code, :remote_load, [["foo", "bar"], [:foo@machine]]}
-    end
-
     test "publish pubsub - returns mfa for publishing message via phoneix pubsub to topic" do
       codegen = %Codegen{}
       message = %{status: :done}

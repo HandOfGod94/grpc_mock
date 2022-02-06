@@ -1,12 +1,12 @@
 defmodule GrpcMock.DynamicCompiler.Codegen.Instruction do
   alias GrpcMock.Extension.Code
-  alias GrpcMock.DynamicCompiler.Codegen.Modules.Store
+  alias GrpcMock.DynamicCompiler.Codegen.ModulesStore
   alias GrpcMock.DynamicCompiler.Codegen
   alias Phoenix.PubSub
 
   @type compiled_modules :: {module(), binary()}
   @type generator_fn :: (Codegen.t() -> [compiled_modules()])
-  @type records_fn :: (Codegen.t() -> [Store.dyn_module()])
+  @type records_fn :: (Codegen.t() -> [ModulesStore.dyn_module()])
 
   @type compile_instruction :: {:compile, generator_fn: generator_fn()}
   @type save_instruction :: {:save, {:modules_generated, repo: atom(), records_fn: records_fn()}}

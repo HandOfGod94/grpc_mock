@@ -14,14 +14,9 @@ defmodule GrpcMock.DynamicServer.ServergenTest do
     assert result.instructions == [generate_implmentation: [template: "test-template.eex"]]
   end
 
-  test "launch_on/2 - adds instruction to launch server on nodes" do
-    result = Servergen.launch_on(%Servergen{}, nodes: [:foo@machine])
-    assert result.instructions == [launch_on: [nodes: [:foo@machine]]]
-  end
-
-  test "save/2 - adds instruction to save generated modules in mnesia" do
-    result = Servergen.save(%Servergen{}, repo: :foo_repo)
-    assert [save: [repo: [repo: :foo_repo], records_fn: _]] = result.instructions
+  test "launch/2 - adds instruction to launch grpc servier" do
+    result = Servergen.launch(%Servergen{})
+    assert result.instructions == [{:launch}]
   end
 
   test "add_error/2 - adds error to servergen and sets valid? to false" do

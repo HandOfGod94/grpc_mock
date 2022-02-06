@@ -19,11 +19,6 @@ defmodule GrpcMock.DynamicCompiler.CodegenTest do
     assert result.instructions == [publish: {:pubsub, [topic: "test-topic", message: %{status: :done}]}]
   end
 
-  test "load_modules_on/2 - adds instruction to publish modules code on erlang nodes" do
-    result = Codegen.load_modules_on(%Codegen{}, nodes: [:foo@machine])
-    assert result.instructions == [publish: {:code, [nodes: [:foo@machine]]}]
-  end
-
   test "add_error/2 - sets valid? to false and adds errors to codegen struct" do
     result = Codegen.add_error(%Codegen{}, {:error, :something_went_wrong})
     refute result.valid?
