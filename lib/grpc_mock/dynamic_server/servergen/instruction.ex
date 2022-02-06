@@ -10,7 +10,7 @@ defmodule GrpcMock.DynamicServer.Servergen.Instruction do
         {:error, changeset} -> Servergen.add_error(servergen, changeset)
       end
 
-    {servergen, {Function, :identity, [servergen]}}
+    {servergen, noop_mfa(servergen)}
   end
 
   def decode_instruction(servergen, {:generate_implmentation, template: template}) do
@@ -24,10 +24,12 @@ defmodule GrpcMock.DynamicServer.Servergen.Instruction do
         error -> Servergen.add_error(servergen, {:generate_implmentation, error})
       end
 
-    {servergen, {Function, :identity, [servergen]}}
+    {servergen, noop_mfa(servergen)}
   end
 
   def decode_instruction(servergen, {:launch}) do
     {servergen, {Server, :start, [servergen.server, servergen.endpoint]}}
   end
+
+  defp noop_mfa(value), do: {Function, :identity, [value]}
 end

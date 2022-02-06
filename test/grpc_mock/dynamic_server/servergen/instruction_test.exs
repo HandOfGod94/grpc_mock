@@ -52,8 +52,8 @@ defmodule GrpcMock.DynamicServer.Servergen.InstructionTest do
       assert state.endpoint == Greeter.Endpoint
     end
 
-    test "generate_implementation - adds error when server body class is not loaded" do
-      server = build(:server)
+    test "generate_implementation - adds error when required modules class is not loaded" do
+      server = build(:server, service: "Invalid.Service")
       servergen = Servergen.new() |> Servergen.set_server(server)
 
       {state, action} = decode_instruction(servergen, {:generate_implmentation, template: @template})

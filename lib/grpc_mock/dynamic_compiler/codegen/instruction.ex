@@ -10,9 +10,7 @@ defmodule GrpcMock.DynamicCompiler.Codegen.Instruction do
 
   @type compile_instruction :: {:compile, generator_fn: generator_fn()}
   @type save_instruction :: {:save, {:modules_generated, repo: atom(), records_fn: records_fn()}}
-  @type publish_instruction ::
-          {:publish, {:pubsub, topic: String.t(), message: any()}}
-          | {:publish, {:code, nodes: list(atom())}}
+  @type publish_instruction :: {:publish, {:pubsub, topic: String.t(), message: any()}}
 
   @type instruction :: compile_instruction() | save_instruction() | publish_instruction()
 
@@ -28,7 +26,7 @@ defmodule GrpcMock.DynamicCompiler.Codegen.Instruction do
         {:error, error} -> Codegen.add_error(codegen, {:compile, error})
       end
 
-    {codegen, {Function, :identity, [codegen]}}
+    {codegen, noop_mfa(codegen)}
   end
 
   def decode_instruction(codegen, {:save, {:modules_generated, repo: repo, records_fn: records_fn}}) do
@@ -49,4 +47,6 @@ defmodule GrpcMock.DynamicCompiler.Codegen.Instruction do
 
     %{codegen | modules_generated: modules_generated ++ codegen.modules_generated}
   end
+
+  defp noop_mfa(value), do: {Function, :identity, [value]}
 end
