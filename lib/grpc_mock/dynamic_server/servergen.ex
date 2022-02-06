@@ -24,48 +24,58 @@ defmodule GrpcMock.DynamicServer.Servergen do
 
   @type t :: %__MODULE__{
           server: Server.t(),
-          endpoint: atom(),
+          endpoint: module(),
           valid?: boolean(),
           errors: [any()],
           instructions: [Instruction.instructions()]
         }
 
+  @spec new() :: t()
   def new, do: %__MODULE__{}
 
+  @spec set_server(t(), Server.t()) :: t()
   def set_server(servergen, server) do
     %{servergen | server: server}
   end
 
+  @spec set_endpoint(t(), module()) :: t()
   def set_endpoint(servergen, endpoint) do
     %{servergen | endpoint: endpoint}
   end
 
+  @spec add_error(t(), any()) :: t()
   def add_error(servergen, errors) do
     %{servergen | valid?: false, errors: [errors | servergen.errors]}
   end
 
+  @spec changeset_error(t()) :: Ecto.Changeset.t() | nil
   def changeset_error(servergen) do
     Enum.find(servergen.errors, &match?(%Ecto.Changeset{}, &1))
   end
 
+  @spec build_server_struct(t(), map()) :: t()
   def build_server_struct(servergen, params) do
     servergen |> put_instruction({:build_server_struct, params: params})
   end
 
+  @spec generate_implmentation(t(), template: filename) :: t() when filename: String.t()
   def generate_implmentation(servergen, template: template) do
     servergen |> put_instruction({:generate_implmentation, template: template})
   end
 
+  @spec launch(t()) :: t()
   def launch(servergen) do
     servergen |> put_instruction({:launch})
   end
 
+  @spec put_instruction(t(), Instruction.instruction()) :: t()
   defp put_instruction(servergen, instruction) do
     %{servergen | instructions: [instruction | servergen.instructions]}
   end
 
   defp take_instructions(servergen), do: Enum.reverse(servergen.instructions)
 
+  @spec apply_instruction(t()) :: t()
   def apply_instruction(%__MODULE__{} = servergen) do
     servergen
     |> take_instructions()

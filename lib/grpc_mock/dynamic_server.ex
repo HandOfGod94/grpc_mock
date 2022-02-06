@@ -35,6 +35,7 @@ defmodule GrpcMock.DynamicServer do
   end
 
   @template :code.priv_dir(:grpc_mock) |> Path.join("dynamic_server.eex")
+  @spec start_server(Servergen.t(), map()) :: {:ok, Server.t()} | {:error, any()}
   def start_server(servergen, server_params) do
     servergen =
       servergen

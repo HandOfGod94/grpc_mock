@@ -8,15 +8,12 @@ defmodule GrpcMock.DynamicCompiler.Codegen.Instruction do
   @type generator_fn :: (Codegen.t() -> [compiled_modules()])
   @type records_fn :: (Codegen.t() -> [ModulesStore.dyn_module()])
 
-  @type compile_instruction :: {:compile, generator_fn: generator_fn()}
-  @type save_instruction :: {:save, {:modules_generated, repo: atom(), records_fn: records_fn()}}
-  @type publish_instruction :: {:publish, {:pubsub, topic: String.t(), message: any()}}
+  @type instruction ::
+          {:compile, generator_fn: generator_fn()}
+          | {:save, {:modules_generated, repo: atom(), records_fn: records_fn()}}
+          | {:publish, {:pubsub, topic: String.t(), message: any()}}
 
-  @type instruction :: compile_instruction() | save_instruction() | publish_instruction()
-
-  @type args :: [any()]
-  @type function_name :: atom()
-  @type mfa_tuple :: {module(), function_name(), args()}
+  @type mfa_tuple :: {module(), function_name :: atom(), args :: [any()]}
 
   @spec decode_instruction(Codegen.t(), instruction()) :: {Codegen.t(), mfa_tuple()}
   def decode_instruction(codegen, {:compile, generator_fn: generator_fn}) do

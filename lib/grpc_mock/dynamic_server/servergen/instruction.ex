@@ -3,6 +3,14 @@ defmodule GrpcMock.DynamicServer.Servergen.Instruction do
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicServer.ImplmentationGenerator
 
+  @type instruction ::
+          {:build_server_struct, params: map()}
+          | {:generate_implmentation, template: String.t()}
+          | {:launch}
+
+  @type mfa_tuple :: {module(), function_name :: atom(), args :: [any()]}
+
+  @spec decode_instruction(Servergen.t(), instruction()) :: {Servergen.t(), mfa_tuple()}
   def decode_instruction(servergen, {:build_server_struct, params: params}) do
     servergen =
       case Server.new(params) do

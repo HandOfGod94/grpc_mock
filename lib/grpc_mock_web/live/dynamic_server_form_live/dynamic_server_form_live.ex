@@ -33,12 +33,13 @@ defmodule GrpcMockWeb.DynamicServerFormLive do
 
   @impl Phoenix.LiveView
   def handle_event("save", %{"server" => params}, socket) do
-    with {:ok, server} <- DynamicServer.start_server(Servergen.new(), params) do
-      {:noreply,
-       socket
-       |> put_flash(:info, "Dynamic server created successfully.")
-       |> redirect(to: Routes.dynamic_server_path(GrpcMockWeb.Endpoint, :show, server))}
-    else
+    case DynamicServer.start_server(Servergen.new(), params) do
+      {:ok, server} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Dynamic server created successfully.")
+         |> redirect(to: Routes.dynamic_server_path(GrpcMockWeb.Endpoint, :show, server))}
+
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign(socket, changeset: changeset)}
 

@@ -24,6 +24,7 @@ defmodule GrpcMock.DynamicCompiler.Codegen.ModulesStore do
             code_binary: binary()
           )
 
+  @spec store_options() :: Keyword.t()
   def store_options do
     [
       record_name: @table,
