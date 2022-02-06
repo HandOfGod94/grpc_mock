@@ -36,10 +36,6 @@ defmodule GrpcMock.DynamicCompiler.Codegen.Instruction do
     {codegen, {repo, :save_all, [records]}}
   end
 
-  def decode_instruction(codegen, {:publish, {:code, nodes: nodes}}) do
-    {codegen, {Code, :remote_load, [codegen.modules_generated, nodes]}}
-  end
-
   @pubsub GrpcMock.PubSub
   def decode_instruction(codegen, {:publish, {:pubsub, topic: topic, message: message}}) do
     {codegen, {PubSub, :broadcast!, [@pubsub, topic, message]}}

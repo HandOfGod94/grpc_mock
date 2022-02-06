@@ -5,7 +5,6 @@ defmodule GrpcMock.DynamicServer do
   alias GrpcMock.DynamicServer.Server
   alias GrpcMock.DynamicSupervisor
   alias GrpcMock.DynamicServer.Servergen
-  alias GrpcMock.DynamicServer.Servergen.ServerRepo
 
   require Logger
 
@@ -46,8 +45,7 @@ defmodule GrpcMock.DynamicServer do
       servergen
       |> build_server_struct(server_params)
       |> generate_implmentation(template: @template)
-      |> launch_on(nodes: [node() | Node.list()])
-      |> save(ServerRepo)
+      |> launch()
       |> apply_instruction()
 
     cond do
@@ -59,21 +57,10 @@ defmodule GrpcMock.DynamicServer do
 
   @spec stop_server(Server.id()) :: {:ok, Server.t()} | {:error, :not_found} | nil
   def stop_server(id) do
-    with {_pid, server} <- fetch_server(id),
-         :ok <- stop_on_all_nodes(id) do
+    with {pid, server} <- fetch_server(id),
+         :ok <- DynamicSupervisor.stop_server(pid) do
       Logger.info("successfully stopped server")
       {:ok, server}
     end
-  end
-
-  defp stop_on_all_nodes(id) do
-    nodes = [node() | Node.list()]
-
-    Enum.each(nodes, fn node ->
-      Node.spawn(node, fn ->
-        owner_node_pid = :pg.get_local_members(id) |> Enum.at(0)
-        DynamicSupervisor.stop_server(owner_node_pid)
-      end)
-    end)
   end
 end

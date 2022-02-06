@@ -17,7 +17,6 @@ defmodule GrpcMock.DynamicServer.Servergen do
 
   require Logger
   import GrpcMock.DynamicServer.Servergen.Instruction
-  import GrpcMock.DynamicServer.Servergen.ServerStore
   alias GrpcMock.DynamicServer.Servergen.Instruction
   alias GrpcMock.DynamicServer.Server
 
@@ -57,16 +56,8 @@ defmodule GrpcMock.DynamicServer.Servergen do
     servergen |> put_instruction({:generate_implmentation, template: template})
   end
 
-  def launch_on(servergen, nodes: nodes) do
-    servergen |> put_instruction({:launch_on, nodes: nodes})
-  end
-
-  def save(servergen, repo) do
-    records_fn = fn %{server: server} = _servergen ->
-      grpc_server(id: server.id, service: server.service, port: server.port, mock_responses: server.mock_responses)
-    end
-
-    servergen |> put_instruction({:save, repo: repo, records_fn: records_fn})
+  def launch(servergen) do
+    servergen |> put_instruction({:launch})
   end
 
   defp put_instruction(servergen, instruction) do

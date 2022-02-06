@@ -92,12 +92,6 @@ defmodule GrpcMock.DynamicCompiler.Codegen do
     codegen |> put_instruction(instruction)
   end
 
-  @spec load_modules_on(t(), nodes: [node()]) :: t()
-  def load_modules_on(%__MODULE__{} = codegen, nodes: nodes) do
-    instruction = {:publish, {:code, nodes: nodes}}
-    codegen |> put_instruction(instruction)
-  end
-
   @spec add_error(t(), any()) :: t()
   def add_error(%__MODULE__{} = codegen, error) do
     %{codegen | valid?: false, errors: [error | codegen.errors]}

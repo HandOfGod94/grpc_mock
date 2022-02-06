@@ -44,17 +44,5 @@ defmodule GrpcMock.DynamicServer.Server do
     |> apply_action(:update)
   end
 
-  def start(server, endpoint, nodes) do
-    nodes
-    |> Enum.with_index()
-    |> Enum.each(fn {node, idx} ->
-      ## HACK: for now it's just incrementing port number, so in local it doesn't clash
-      server = %{server | port: server.port + idx}
-
-      Node.spawn(node, fn ->
-        {:ok, pid} = DynamicSupervisor.start_server(server, endpoint)
-        :pg.join(server.id, pid)
-      end)
-    end)
-  end
+  def start(server, endpoint), do: DynamicSupervisor.start_server(server, endpoint)
 end

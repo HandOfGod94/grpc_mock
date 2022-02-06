@@ -27,12 +27,7 @@ defmodule GrpcMock.DynamicServer.Servergen.Instruction do
     {servergen, {Function, :identity, [servergen]}}
   end
 
-  def decode_instruction(servergen, {:launch_on, nodes: nodes}) do
-    {servergen, {Server, :start, [servergen.server, servergen.endpoint, nodes]}}
-  end
-
-  def decode_instruction(servergen, {:save, repo: repo, records_fn: records_fn}) do
-    records = records_fn.(servergen)
-    {servergen, {repo, :save, [records]}}
+  def decode_instruction(servergen, {:launch}) do
+    {servergen, {Server, :start, [servergen.server, servergen.endpoint]}}
   end
 end

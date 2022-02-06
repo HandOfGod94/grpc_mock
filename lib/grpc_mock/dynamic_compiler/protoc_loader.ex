@@ -26,7 +26,6 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoader do
     |> generate_modules_with(&protobuf/1)
     |> save_with(ModuleRepo)
     |> broadcast_status(@topic, %{status: :done})
-    |> load_modules_on(nodes: Node.list())
   end
 
   defp protobuf(codegen) do

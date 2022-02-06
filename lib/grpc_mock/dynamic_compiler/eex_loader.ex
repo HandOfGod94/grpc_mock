@@ -20,7 +20,6 @@ defmodule GrpcMock.DynamicCompiler.EExLoader do
     |> generate_modules_with(&eex_compile/1)
     |> save_with(ModuleRepo)
     |> broadcast_status(@topic, %{status: :done})
-    |> load_modules_on(nodes: Node.list())
   end
 
   defp eex_compile(codegen) do
