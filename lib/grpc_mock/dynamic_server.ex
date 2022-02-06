@@ -16,11 +16,6 @@ defmodule GrpcMock.DynamicServer do
 
   @registry GrpcMock.ServerRegistry
 
-  @moduledoc """
-  format in which servers are stored in registry:
-  {key, pid, serverstrucct} where key == Nanoid
-  """
-
   @spec list_all_servers() :: list(Server.t())
   def list_all_servers do
     match_pattern = {:_, :"$1", :"$2"}

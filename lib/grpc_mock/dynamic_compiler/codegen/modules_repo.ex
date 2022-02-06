@@ -1,5 +1,5 @@
-defmodule GrpcMock.DynamicCompiler.Codegen.Modules.Repo do
-  alias GrpcMock.DynamicCompiler.Codegen.Modules.Store
+defmodule GrpcMock.DynamicCompiler.Codegen.ModulesRepo do
+  alias GrpcMock.DynamicCompiler.Codegen.ModulesStore
 
   @table :dyn_module
 
@@ -16,14 +16,14 @@ defmodule GrpcMock.DynamicCompiler.Codegen.Modules.Repo do
     end)
   end
 
-  @spec save(Store.dyn_module()) :: {:atomic, term()} | {:aborted, reason :: term()}
+  @spec save(ModulesStore.dyn_module()) :: {:atomic, term()} | {:aborted, reason :: term()}
   def save(module_record) do
     :mnesia.transaction(fn ->
       :mnesia.write(module_record)
     end)
   end
 
-  @spec save_all([Store.dyn_module()]) :: {:atomic, term()} | {:aborted, reason :: term()}
+  @spec save_all([ModulesStore.dyn_module()]) :: {:atomic, term()} | {:aborted, reason :: term()}
   def save_all(module_records) when is_list(module_records) do
     :mnesia.transaction(fn ->
       Enum.each(module_records, &:mnesia.write/1)

@@ -1,7 +1,7 @@
 defmodule GrpcMock.DynamicCompiler.EExLoader do
   require Logger
   import GrpcMock.DynamicCompiler.Codegen
-  alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
+  alias GrpcMock.DynamicCompiler.Codegen.ModulesRepo
 
   @type t :: %__MODULE__{template: String.t(), bindings: keyword(atom())}
   defstruct [:template, :bindings, modules_generated: []]
@@ -18,7 +18,7 @@ defmodule GrpcMock.DynamicCompiler.EExLoader do
   defp set_compile_instructions(codegen) do
     codegen
     |> generate_modules_with(&eex_compile/1)
-    |> save_with(ModuleRepo)
+    |> save_with(ModulesRepo)
     |> broadcast_status(@topic, %{status: :done})
   end
 

@@ -1,7 +1,7 @@
 defmodule GrpcMock.DynamicCompiler do
   require Logger
   alias GrpcMock.DynamicCompiler.ProtocLoader
-  alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
+  alias GrpcMock.DynamicCompiler.Codegen.ModulesRepo
 
   @task_supervisor GrpcMock.TaskSupervisor
 
@@ -11,7 +11,5 @@ defmodule GrpcMock.DynamicCompiler do
   end
 
   @spec available_modules :: list(atom())
-  def available_modules do
-    ModuleRepo.all_dirty()
-  end
+  def available_modules, do: ModulesRepo.all_dirty()
 end

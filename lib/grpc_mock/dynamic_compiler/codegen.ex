@@ -22,7 +22,7 @@ defmodule GrpcMock.DynamicCompiler.Codegen do
 
   require Logger
 
-  import GrpcMock.DynamicCompiler.Codegen.Modules.Store
+  import GrpcMock.DynamicCompiler.Codegen.ModulesStore
   import GrpcMock.DynamicCompiler.Codegen.Instruction
 
   alias GrpcMock.DynamicCompiler.Codegen.Instruction

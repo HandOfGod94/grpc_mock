@@ -1,7 +1,7 @@
 defmodule GrpcMock.DynamicCompiler.ProtocLoader do
   require Logger
   import GrpcMock.DynamicCompiler.Codegen
-  alias GrpcMock.DynamicCompiler.Codegen.Modules.Repo, as: ModuleRepo
+  alias GrpcMock.DynamicCompiler.Codegen.ModulesRepo
 
   @type t :: %__MODULE__{import_path: String.t(), file: String.t()}
   defstruct [:import_path, :file, modules_generated: []]
@@ -24,7 +24,7 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoader do
   defp set_compile_instructions(codegen) do
     codegen
     |> generate_modules_with(&protobuf/1)
-    |> save_with(ModuleRepo)
+    |> save_with(ModulesRepo)
     |> broadcast_status(@topic, %{status: :done})
   end
 
