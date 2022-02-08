@@ -7,6 +7,12 @@ import Config
 # any compile-time configuration in here, as it won't be applied.
 # The block below contains prod specific runtime configuration.
 
+config :grpc_mock,
+  app_mode: String.to_atom(System.get_env("APP_MODE", "interactive")),
+  launch_config:
+    System.get_env("LAUNCH_CONFIG_YML", "test/support/fixtures/empty_launch_config.yml")
+    |> YamlElixir.read_all_from_file!()
+
 if config_env() != :prod do
   host = System.get_env("PHX_HOST") || "localhost"
   port = String.to_integer(System.get_env("PORT") || "4000")

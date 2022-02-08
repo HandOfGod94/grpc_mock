@@ -10,6 +10,11 @@ defmodule GrpcMock.DynamicCompiler do
     Task.Supervisor.start_child(@task_supervisor, ProtocLoader, :load_modules, [import_path, proto_file])
   end
 
+  @spec load_for_proto_sync(String.t(), String.t()) :: {:ok, term()} | {:error, any()}
+  def load_for_proto_sync(import_path, proto_file) do
+    ProtocLoader.load_modules(import_path, proto_file)
+  end
+
   @spec available_modules :: list(atom())
   def available_modules, do: ModulesRepo.all_dirty()
 end

@@ -1,0 +1,14 @@
+---
+kind: grpc
+volume:
+  kind: filesystem
+loader:
+  import_path: ./test/support/fixtures
+  file: helloworld.proto
+server:
+  service: GrpcMock.Protos.Helloworld.Greeter.Service
+  port: 3001
+  mock_responses:
+    - method: say_hello
+      return_type: GrpcMock.Protos.Helloworld.HelloReply
+      data: '{"message": "hello world"}'

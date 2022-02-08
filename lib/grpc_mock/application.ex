@@ -1,5 +1,6 @@
 defmodule GrpcMock.Application do
   # credo:disable-for-this-file
+  require Logger
 
   alias GrpcMock.DynamicCompiler.Codegen.ModulesStore
 
@@ -12,21 +13,20 @@ defmodule GrpcMock.Application do
     # TODO: add wait for tables check
     :mnesia.create_table(:dyn_module, ModulesStore.store_options())
 
+    Logger.info("App Mode: #{inspect(app_mode())}")
+    Logger.info("Launch config: #{inspect(launch_config())}")
+
     children = [
-      # Start the Telemetry supervisor
       GrpcMockWeb.Telemetry,
-      # Start the PubSub system
       {Phoenix.PubSub, name: GrpcMock.PubSub},
       # Start the Endpoint (http/https)
       GrpcMockWeb.Endpoint,
-      # Start a worker by calling: GrpcMock.Worker.start_link(arg)
-      {Task.Supervisor, name: GrpcMock.TaskSupervisor},
       {Registry, keys: :unique, name: GrpcMock.ServerRegistry},
-      {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicSupervisor}
+      {Task.Supervisor, name: GrpcMock.TaskSupervisor},
+      {DynamicSupervisor, strategy: :one_for_one, name: GrpcMock.DynamicSupervisor},
+      {GrpcMock.NonInteractiveLauncher, %{app_mode: app_mode(), launch_config: launch_config()}}
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: GrpcMock.Supervisor]
     Supervisor.start_link(children, opts)
   end
@@ -38,4 +38,7 @@ defmodule GrpcMock.Application do
     GrpcMockWeb.Endpoint.config_change(changed, removed)
     :ok
   end
+
+  defp app_mode, do: Application.get_env(:grpc_mock, :app_mode)
+  defp launch_config, do: Application.get_env(:grpc_mock, :launch_config)
 end
