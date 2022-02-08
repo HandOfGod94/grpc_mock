@@ -22,7 +22,7 @@ defmodule GrpcMockWeb.ProtocModuleLive.Index do
   @impl Phoenix.LiveView
   def handle_event("save", %{"protoc_compiler" => params}, socket) do
     %{"import_path" => import_path, "proto_file_glob" => proto_file_glob} = params
-    DynamicCompiler.load_for_proto(import_path, proto_file_glob)
+    DynamicCompiler.async_load_proto_types(import_path, proto_file_glob)
 
     {:noreply,
      socket

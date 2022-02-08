@@ -31,7 +31,7 @@ defmodule GrpcMock.NonInteractiveLauncher do
       "server" => server_params
     } = Enum.at(launch_config, 0)
 
-    with {:ok, _} <- DynamicCompiler.load_for_proto_sync(import_path, file),
+    with {:ok, _} <- DynamicCompiler.load_proto_types(import_path, file),
          {:ok, _} <- DynamicServer.start_server(%Servergen{}, server_params) do
       Logger.info("successfully started grpc mock server")
     else

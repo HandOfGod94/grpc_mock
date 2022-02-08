@@ -6,10 +6,8 @@ defmodule GrpcMock.DynamicCompiler.EExLoaderTest do
 
   alias GrpcMock.DynamicCompiler.EExLoader
   alias GrpcMock.DynamicCompiler.ProtocLoader
-  alias GrpcMock.DynamicCompiler.Codegen.ModulesStore
 
   @template :code.priv_dir(:grpc_mock) |> Path.join("dynamic_server.eex")
-  @mnesia_table :dyn_module
 
   describe "load_modules/2 - error scenarios" do
     test "returns error when template is absent" do

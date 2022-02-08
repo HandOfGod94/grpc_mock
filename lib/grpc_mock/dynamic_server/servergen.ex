@@ -73,12 +73,12 @@ defmodule GrpcMock.DynamicServer.Servergen do
     %{servergen | instructions: [instruction | servergen.instructions]}
   end
 
-  defp take_instructions(servergen), do: Enum.reverse(servergen.instructions)
+  defp get_instructions(servergen), do: Enum.reverse(servergen.instructions)
 
   @spec apply_instruction(t()) :: t()
   def apply_instruction(%__MODULE__{} = servergen) do
     servergen
-    |> take_instructions()
+    |> get_instructions()
     |> Enum.reduce(servergen, &do_apply(&2, &1))
     |> Map.put(:instructions, [])
   end

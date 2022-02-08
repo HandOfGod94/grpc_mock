@@ -2,7 +2,6 @@ defmodule GrpcMock.DynamicCompiler.ProtocLoaderTest do
   use GrpcMock.MnesiaCase, async: true
   doctest GrpcMock.DynamicCompiler.ProtocLoader
   alias GrpcMock.DynamicCompiler.ProtocLoader
-  alias GrpcMock.DynamicCompiler.Codegen.ModulesStore
 
   @mnesia_table :dyn_module
 

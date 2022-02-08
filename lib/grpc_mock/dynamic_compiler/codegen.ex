@@ -101,7 +101,7 @@ defmodule GrpcMock.DynamicCompiler.Codegen do
     %{codegen | instructions: [instruction | codegen.instructions]}
   end
 
-  defp take_instructions(%__MODULE__{} = codegen), do: Enum.reverse(codegen.instructions)
+  defp get_instructions(%__MODULE__{} = codegen), do: Enum.reverse(codegen.instructions)
 
   ## instructions applier
 
@@ -109,7 +109,7 @@ defmodule GrpcMock.DynamicCompiler.Codegen do
   def apply_instruction(%__MODULE__{} = codegen) do
     codegen =
       codegen
-      |> take_instructions()
+      |> get_instructions()
       |> Enum.reduce(codegen, &do_apply(&2, &1))
       |> Map.put(:instructions, [])
       |> Map.put(:status, :done)
