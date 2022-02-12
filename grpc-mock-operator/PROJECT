@@ -1,0 +1,19 @@
+domain: grakh.com
+layout:
+- go.kubebuilder.io/v3
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: grpc-mock-operator
+repo: github.com/handofgod94/grpc-mock-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: grakh.com
+  group: grpc-mock
+  kind: GRPCMock
+  path: github.com/handofgod94/grpc-mock-operator/api/v1alpha1
+  version: v1alpha1
+version: "3"

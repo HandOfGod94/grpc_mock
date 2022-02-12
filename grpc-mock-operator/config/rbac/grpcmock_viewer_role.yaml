@@ -1,0 +1,20 @@
+# permissions for end users to view grpcmocks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: grpcmock-viewer-role
+rules:
+- apiGroups:
+  - grpc-mock.grakh.com
+  resources:
+  - grpcmocks
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - grpc-mock.grakh.com
+  resources:
+  - grpcmocks/status
+  verbs:
+  - get
